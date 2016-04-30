@@ -4,7 +4,8 @@ import static constant.Keyword.*;
 
 
 /**
-*	My circular implementation of an array-based abstract data structure resembling a queue to be used in the analysis of trade data.
+*	A circular implementation of an array-based abstract data structure with capabilities of first-in-first-out (for multithreading) or random access (return normalized array) to be used in the analysis of trade data.
+*	Project needs a thread-safe queue.
 *
 *	@author Jaewan Yun (Jay50@pitt.edu)
 *	@version 1.0.0
@@ -18,14 +19,16 @@ public class JaeList<T>
 	private volatile T[] jaeList = null;
 
 	// class settings.
-	private final int MAX_CAPACITY = 10000000;
+	private final int MAX_CAPACITY = 1000000000;
 	private final int DEFAULT_CAPACITY = 2;
 	private final double EXPANSION_FACTOR = 2.0;
 	private final double REDUCTION_FACTOR = 2.0;
+	private final int REDUCTION_REQUIREMENT = 1025;
 
 	// class states.
+	private static volatile int concurrentObjects = 0;
 	private static volatile long concurrentCapacity = 0;
-	private static volatile int concurrentExistence = 0;
+	private static volatile long concurrentSize = 0;
 
 	// array states.
 	private volatile int size = 0;
@@ -49,7 +52,7 @@ public class JaeList<T>
 		synchronized(this.getClass())
 		{
 			concurrentCapacity += DEFAULT_CAPACITY;
-			concurrentExistence++;
+			concurrentObjects++;
 		}
 	}
 
@@ -68,7 +71,7 @@ public class JaeList<T>
 		synchronized(this.getClass())
 		{
 			concurrentCapacity += capacity;
-			concurrentExistence++;
+			concurrentObjects++;
 		}
 	}
 
@@ -84,12 +87,16 @@ public class JaeList<T>
 		initialized = true;
 		synchronized(this.getClass())
 		{
-			concurrentExistence++;
+			concurrentObjects++;
 		}
 	}
 
 	/**
-	*	A helper method for add(T, Keyword).
+	*	@param entry An entry to be added.
+	*	@throws IllegalStateException when this has not been properly initialized.
+	*	@throws IllegalArgumentException when entry cannot be added due to a predetermined maximum capacity.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public void add(T entry)
 	{
@@ -108,15 +115,14 @@ public class JaeList<T>
 		// DEBUG
 		if(keyword == IDDEBUG)
 		{
-			System.out.println("\n\nDEBUG ENABLED");
-			System.out.println("Prior to ADD : CAPACITY : " + capacity);
-			System.out.println("Prior to ADD : HEADCURSOR : " + headCursor);
-			System.out.println("Prior to ADD : TAILINDEX : " + tailIndex);
-			System.out.println("Prior to ADD : SIZE : " + size + " ADDING " + entry + "(" + entry.getClass().toString() + ")");
+			print(1, "\n\nIDDEBUG ENABLED");
+			print(1, "Prior to ADD : CAPACITY : " + capacity);
+			print(1, "Prior to ADD : HEADCURSOR : " + headCursor);
+			print(1, "Prior to ADD : TAILINDEX : " + tailIndex);
 		}
-		else if(keyword == DEBUG)
+		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			System.out.println("Prior to ADD : SIZE : " + size + " ADDING " + entry + "(" + entry.getClass().toString() + ")");
+			print(1, "Prior to ADD : SIZE : " + size + " ADDING " + entry + "(" + entry.getClass().toString() + ")");
 		}
 		// END DEBUG
 
@@ -128,19 +134,22 @@ public class JaeList<T>
 		jaeList[headCursor] = entry;
 		headCursor = (headCursor + 1) % capacity;
 		size++;
+		synchronized(this.getClass())
+		{
+			concurrentSize++;
+		}
 
 
 		// DEBUG
 		if(keyword == IDDEBUG)
 		{
-			System.out.println("After ADD : CAPACITY : " + capacity);
-			System.out.println("After ADD : HEADCURSOR : " + headCursor);
-			System.out.println("After ADD : TAILINDEX : " + tailIndex);
-			System.out.println("After ADD : SIZE : " + size + " ADDED " + entry + "(" + entry.getClass().toString() + ")");
+			print(1, "After ADD : CAPACITY : " + capacity);
+			print(1, "After ADD : HEADCURSOR : " + headCursor);
+			print(1, "After ADD : TAILINDEX : " + tailIndex);
 		}
-		else if(keyword == DEBUG)
+		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			System.out.println("After ADD : SIZE : " + size + " ADDED " + entry + "(" + entry.getClass().toString() + ")");
+			print(1, "After ADD : SIZE : " + size + " ADDED " + entry + "(" + entry.getClass().toString() + ")");
 		}
 		// END DEBUG
 	}
@@ -161,7 +170,10 @@ public class JaeList<T>
 	// }
 
 	/**
-	*	A helper method for remove(Keyword).
+	*	@return the element that was removed.
+	*	@throws IllegalArgumentException if data structure is empty.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public T remove()
 	{
@@ -184,15 +196,14 @@ public class JaeList<T>
 		// DEBUG
 		if(keyword == IDDEBUG)
 		{
-			System.out.println("\n\nDEBUG ENABLED");
-			System.out.println("Prior to REMOVE : CAPACITY : " + capacity);
-			System.out.println("Prior to REMOVE : HEADCURSOR : " + headCursor);
-			System.out.println("Prior to REMOVE : TAILINDEX : " + tailIndex);
-			System.out.println("Prior to REMOVE : SIZE : " + size + " REMOVING " + jaeList[tailIndex] + "(" + jaeList[tailIndex].getClass().toString() + ")");
+			print(1, "\n\nIDDEBUG ENABLED");
+			print(1, "Prior to REMOVE : CAPACITY : " + capacity);
+			print(1, "Prior to REMOVE : HEADCURSOR : " + headCursor);
+			print(1, "Prior to REMOVE : TAILINDEX : " + tailIndex);
 		}
-		else if(keyword == DEBUG)
+		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			System.out.println("Prior to REMOVE : SIZE : " + size + " REMOVING " + jaeList[tailIndex] + "(" + jaeList[tailIndex].getClass().toString() + ")");
+			print(1, "Prior to REMOVE : SIZE : " + size + " REMOVING " + jaeList[tailIndex] + "(" + jaeList[tailIndex].getClass().toString() + ")");
 		}
 		// END DEBUG
 
@@ -202,27 +213,31 @@ public class JaeList<T>
 		jaeList[tailIndex] = null;
 		tailIndex = ++tailIndex % capacity;
 		size--;
+		synchronized(this.getClass())
+		{
+			concurrentSize--;
+		}
 
 
 		// DEBUG
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			System.out.println("After REMOVE : SIZE : " + size + " REMOVED " + toReturn + "(" + toReturn.getClass().toString() + ")");
+			print(1, "After REMOVE : SIZE : " + size + " REMOVED " + toReturn + "(" + toReturn.getClass().toString() + ")");
 		}
 		// END DEBUG
 
 
 		// reduce capacity.
-		if(size < (capacity / 4))
+		if((size < (capacity / 4)) && (capacity > REDUCTION_REQUIREMENT))
 			decreaseCapacity(REDUCTION_FACTOR, keyword);
 
 
 		// // DEBUG
 		if(keyword == IDDEBUG)
 		{
-			System.out.println("After REMOVE : CAPACITY : " + capacity);
-			System.out.println("After REMOVE : HEADCURSOR : " + headCursor);
-			System.out.println("After REMOVE : TAILINDEX : " + tailIndex);
+			print(1, "After REMOVE : CAPACITY : " + capacity);
+			print(1, "After REMOVE : HEADCURSOR : " + headCursor);
+			print(1, "After REMOVE : TAILINDEX : " + tailIndex);
 		}
 		// // END DEBUG
 
@@ -242,23 +257,23 @@ public class JaeList<T>
 		// DEBUG
 		if(keyword == DEBUG)
 		{
-			System.out.println("\nSIZE : " + size + " out of " + capacity);
-			System.out.println("INCREASING CAPACITY...");
+			print(1, "\nSIZE : " + size + " out of " + capacity);
+			print(1, "INCREASING CAPACITY...");
 			int count = 0;
 			for(int j = 0; j < jaeList.length; j++)
 			{
-				System.out.print("\tPOS " + j + " > ");
+				print(0, "\tPOS " + j + " > ");
 				if(jaeList[j] != null)
 				{
-					System.out.println(jaeList[j] + "(" + jaeList[j].getClass().toString() + "), ");
+					print(1, jaeList[j] + "(" + jaeList[j].getClass().toString() + ")");
 					count++;
 				}
 				else
 				{
-					System.out.println("null");
+					print(1, "null");
 				}
 			}
-			System.out.println("objectCounter : " + count);
+			print(1, "objectCounter : " + count);
 		}
 		// END DEBUG
 
@@ -268,6 +283,7 @@ public class JaeList<T>
 		{
 			concurrentCapacity -= capacity;
 		}
+		int originalCapacity = capacity;
 		capacity = (int) (capacity * factor);
 		synchronized(this.getClass())
 		{
@@ -276,7 +292,8 @@ public class JaeList<T>
 		T[] temporaryRef = constructArray(capacity);
 		for(int j = 0; j < size; j++)
 		{
-			temporaryRef[j] = jaeList[tailIndex++ % (capacity - 1)];
+			temporaryRef[j] = jaeList[tailIndex % (originalCapacity - 1)];
+			tailIndex++;
 		}
 		tailIndex = 0;
 		headCursor = size;
@@ -286,7 +303,7 @@ public class JaeList<T>
 		// DEBUG
 		if(keyword == DEBUG)
 		{
-			System.out.println("CAPACITY INCREASED TO : " + capacity + "\n");
+			print(1, "CAPACITY INCREASED TO : " + capacity + "\n");
 		}
 		// END DEBUG
 	}
@@ -304,27 +321,27 @@ public class JaeList<T>
 		{
 			for(int j = 0; j < 10; j++)
 			{
-				System.out.print("\n");
+				print(1, "\n");
 			}
-			System.out.println("\nSIZE : " + size + " out of " + capacity);
+			print(1, "\nSIZE : " + size + " out of " + capacity);
 			int count = 0;
 			for(int j = 0; j < jaeList.length; j++)
 			{
-				System.out.print("\tPOS " + j + " > ");
+				print(0, "\tPOS " + j + " > ");
 				if(jaeList[j] != null)
 				{
-					System.out.println(jaeList[j] + "(" + jaeList[j].getClass().toString() + "), ");
+					print(1, jaeList[j] + "(" + jaeList[j].getClass().toString() + ")");
 					count++;
 				}
 				else
 				{
-					System.out.println("null");
+					print(1, "null");
 				}
 			}
-			System.out.println("objectCounter : " + count);
+			print(1, "objectCounter : " + count);
 			for(int j = 0; j < 10; j++)
 			{
-				System.out.print("\n");
+				print(1, "\n");
 			}
 		}
 		// END DEBUG
@@ -354,24 +371,24 @@ public class JaeList<T>
 		// DEBUG
 		if(keyword == DEBUG)
 		{
-			System.out.println("\nSIZE : " + size + " out of " + capacity);
-			System.out.println("DECREASING CAPACITY...");
+			print(1, "\nSIZE : " + size + " out of " + capacity);
+			print(1, "DECREASING CAPACITY...");
 			int count = 0;
 			for(int j = 0; j < jaeList.length; j++)
 			{
-				System.out.print("\tPOS " + j + " > ");
+				print(0, "\tPOS " + j + " > ");
 				if(jaeList[j] != null)
 				{
-					System.out.println(jaeList[j] + "(" + jaeList[j].getClass().toString() + "), ");
+					print(1, jaeList[j] + "(" + jaeList[j].getClass().toString() + ")");
 					count++;
 				}
 				else
 				{
-					System.out.println("null");
+					print(1, "null");
 				}
 			}
-			System.out.println("objectCounter : " + count);
-			System.out.println("CAPACITY DECREASED TO : " + capacity + "\n");
+			print(1, "objectCounter : " + count);
+			print(1, "CAPACITY DECREASED TO : " + capacity + "\n");
 		}
 		// END DEBUG
 	}
@@ -390,7 +407,11 @@ public class JaeList<T>
 
 		}
 		capacity = DEFAULT_CAPACITY;
-		size = 0;
+		synchronized(this.getClass())
+		{
+			concurrentSize -= size;
+			size = 0;
+		}
 		headCursor = 0;
 		tailIndex = 0;
 	}
@@ -432,7 +453,11 @@ public class JaeList<T>
 		// copy references
 		synchronized(this)
 		{
-			size = 0;
+			synchronized(this.getClass())
+			{
+				concurrentSize -= size;
+				size = 0;
+			}
 			for(int j = 0; j < input.length; j++)
 			{
 				if(input[j] != null)
@@ -441,9 +466,25 @@ public class JaeList<T>
 					size++;
 				}
 			}
+			synchronized(this.getClass())
+			{
+				concurrentSize += size;
+			}
+			tailIndex = 0;
 			headCursor = size;
 			return true;
 		}
+	}
+
+	/**
+	*	Sets capacity to a minimal value and tailIndex is shifted to array index of zero.
+	*
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	private synchronized void normalize()
+	{
+
 	}
 
 	/**
@@ -456,6 +497,7 @@ public class JaeList<T>
 	public synchronized T[] toArray()
 	{
 		checkInitialization();
+		normalize();
 		return copyOf(jaeList);
 	}
 
@@ -539,6 +581,11 @@ public class JaeList<T>
 		return false;
 	}
 
+	/**
+	*	@return true if data represented is in full state.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
 	private boolean isFull()
 	{
 		if(((headCursor + 1) % capacity) == tailIndex)
@@ -554,69 +601,99 @@ public class JaeList<T>
 	{
 		synchronized(this.getClass())
 		{
-			concurrentExistence--;
+			concurrentObjects--;
 			concurrentCapacity -= capacity;
 		}
 	}
 
+	/**
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
 	public synchronized String toString()
 	{
 		return jaeList.toString();
 	}
 
 	/**
-	*	@param keyword Keyword that the method body portion execution depends on
+	*	@param keyword Keyword that the method body portion execution is dependent on
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized void showState(Keyword keyword)
 	{
-		if(keyword == DEBUG)
+		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			System.out.println("jaeList :\t" + jaeList);
-			System.out.println("MAX_CAPACITY :\t" + MAX_CAPACITY);
-			System.out.println("DEFAULT_CAPACITY :\t" + DEFAULT_CAPACITY);
-			System.out.println("EXPANSION_FACTOR :\t" + EXPANSION_FACTOR);
-			System.out.println("REDUCTION_FACTOR :\t" + REDUCTION_FACTOR);
-			System.out.println("concurrentCapacity :\t" + concurrentCapacity);
-			System.out.println("concurrentExistence :\t" + concurrentExistence);
-			System.out.println("size :\t" + size);
-			System.out.println("capacity :\t" + capacity);
-			System.out.println("initialized :\t" + initialized);
-			System.out.println("headCursor :\t" + headCursor);
-			System.out.println("tailIndex :\t" + tailIndex);
-			System.out.println("END OF JaeList EXPLICIT STATE\n");
+			print(1, "jaeList Address :\t" + jaeList);
+			print(1, "MAX_CAPACITY :\t\t" + MAX_CAPACITY);
+			print(1, "DEFAULT_CAPACITY :\t" + DEFAULT_CAPACITY);
+			print(1, "EXPANSION_FACTOR :\t" + EXPANSION_FACTOR);
+			print(1, "REDUCTION_FACTOR :\t" + REDUCTION_FACTOR);
+			print(1, "concurrentObjects :\t" + concurrentObjects);
+			print(1, "concurrentCapacity :\t" + concurrentCapacity);
+			print(1, "concurrentSize : \t" + concurrentSize);
+			print(1, "size :\t\t\t" + size);
+			print(1, "capacity :\t\t" + capacity);
+			print(1, "initialized :\t\t" + initialized);
+			print(1, "headCursor :\t\t" + headCursor);
+			print(1, "tailIndex :\t\t" + tailIndex);
+			print(1, "\n\tEND OF JaeList EXPLICIT STATE\n");
+		}
 
+		if(keyword == IDDEBUG)
+		{
 			if(jaeList != null)
 			{
-				System.out.println("length :\t" + jaeList.length);
+				print(1, "length :\t\t" + jaeList.length);
 				if(jaeList[tailIndex] != null)
-					System.out.println("tailIndex type :\t" + jaeList[tailIndex].getClass().toString());
+					print(1, "tailIndex type :\t" + jaeList[tailIndex].getClass().toString());
 				else
-					System.out.println("tailIndex type :\tnull");
+					print(1, "tailIndex type :\tnull");
 				if(jaeList[headCursor] != null)
-					System.out.println("headCursor type :\t" + jaeList[tailIndex].getClass().toString());
+					print(1, "headCursor type :\t" + jaeList[tailIndex].getClass().toString());
 				else
-					System.out.println("headCursor type :\tnull");
+					print(1, "headCursor type :\tnull");
 				if(headCursor - 1 < 0)
 					if(jaeList[capacity - 1] != null)
-						System.out.println("headIndex type :\t" + jaeList[tailIndex].getClass().toString());
+						print(1, "headIndex type :\t" + jaeList[tailIndex].getClass().toString());
 				if(headCursor - 1 >= 0)
 					if(jaeList[headCursor - 1] != null)
-						System.out.println("headIndex type :\t" + jaeList[tailIndex].getClass().toString());
-				System.out.println("END OF T[] EXPLICIT STATE\n");
+						print(1, "headIndex type :\t" + jaeList[tailIndex].getClass().toString());
+				print(1, "\n\tEND OF T[] EXPLICIT STATE\n");
 
 				for(int j = 0; j < jaeList.length; j++)
 				{
-					System.out.print("Index " + j + "\t:\t" + jaeList[j]);
+					print(0, "Index  " + j + ": \t[" + jaeList[j]);
 					if(jaeList[j] != null)
-						System.out.println(" of type " + jaeList[j].getClass().toString());
+						print(1, "\t] of type (" + jaeList[j].getClass().toString() + ")");
 					else
-						System.out.println();
+						print(0, "\t]\n");
 				}
+				print(1, "\n\tEND OF T[] ENUMERATION");
 			}
 			else
 			{
-				System.out.println("jaeList is null therefore unaccessible");
+				print(2, "jaeList is null therefore unaccessible");
 			}
+		}
+	}
+
+	/**
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	private void print(int skip, String toPrint)
+	{
+		System.out.print(toPrint);
+
+		if(skip == 0)
+		{
+			return;
+		}
+
+		for(int j = 0; j < skip; j++)
+		{
+			System.out.print("\n");
 		}
 	}
 }
