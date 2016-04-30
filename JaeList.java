@@ -4,8 +4,9 @@ import static constant.Keyword.*;
 
 
 /**
-*	A circular implementation of an array-based abstract data structure with capabilities of first-in-first-out (for multithreading) or random access (return normalized array) to be used in the analysis of trade data.
-*	Project needs a thread-safe queue.
+*	A circular implementation of an array-based abstract data structure with capabilities of
+*	first-in-first-out to be used in the analysis of trade data. Project requires a thread-safe
+*	queue.
 *
 *	@author Jaewan Yun (Jay50@pitt.edu)
 *	@version 1.0.0
