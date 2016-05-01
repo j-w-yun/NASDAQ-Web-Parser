@@ -1,21 +1,21 @@
 /**
-*	A circular implementation of an array-based abstract data structure with capabilities of first-in-first-out and
-*	first-in-last-out.
-*
-*	@author Jaewan Yun (Jay50@pitt.edu)
-*	@version 1.0.0
+	A circular implementation of an array-based deque.
+
+	@author Jaewan Yun (Jay50@pitt.edu)
+	@version 1.0.0
 */
 
 import java.util.*;
 import constant.*;
 import static constant.Keyword.*;
 
-public class JayList<T> implements Queue<T>, Stack<T>
+public class JayList<T> implements Deque<T>
 {
 	// underlying data structure.
 	private volatile T[] jayList = null;
+	private volatile int[] sorted = null;
 
-	// class settings.
+	// data structure settings.
 	private final int DEFAULT_CAPACITY = 2;	//e.g. 1024
 	private final double EXPANSION_FACTOR = 2.0;
 	private final double REDUCTION_FACTOR = 2.0;
@@ -39,8 +39,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	private volatile int tailIndex = 0;
 
 	/**
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public JayList()
 	{
@@ -58,11 +58,11 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	@param capacity The desired capacity of the underlying data structure.
-	*	@throws IllegalArgumentException when the size of the accepted value exceeds a predetermined maximum capacity.
-	* 	@throws IllegalArgumentException when the size of the accepted value is less than one.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@param capacity The desired capacity of the underlying data structure.
+		@throws IllegalArgumentException when the size of the accepted value exceeds a predetermined maximum capacity.
+		@throws IllegalArgumentException when the size of the accepted value is less than one.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public JayList(int capacity)
 	{
@@ -80,10 +80,10 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	@param input An array used as a template.
-	*	@return true when storage was successful, and false if otherwise.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@param input An array used as a template.
+		@return true when storage was successful, and false if otherwise.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public JayList(T[] input)
 	{
@@ -99,26 +99,26 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	@param entry An entry to be added.
-	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@param entry An entry to be added.
+		@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public T add(T entry)
+	public T addFirst(T entry)
 	{
-		return add(entry, NULL);
+		return addFirst(entry, NULL);
 	}
 	/**
-	*	Bottleneck synchronized with this.
-	*
-	*	@param entry An entry to be added.
-	*	@param keyword Used for development.
-	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
-	*	@throws IllegalArgumentException when entry is null.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		Bottleneck synchronized with this.
+
+		@param entry An entry to be added.
+		@param keyword Used for development.
+		@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
+		@throws IllegalArgumentException when entry is null.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized T add(T entry, Keyword keyword)
+	public synchronized T addFirst(T entry, Keyword keyword)
 	{
 		if(entry == null)
 			throw new IllegalArgumentException();
@@ -126,14 +126,13 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		// DEBUG
 		if(keyword == IDDEBUG)
 		{
-			print(1, "\n\nIDDEBUG ENABLED");
-			print(1, "Prior to ADD : CAPACITY : " + capacity);
-			print(1, "Prior to ADD : HEADCURSOR : " + headCursor);
-			print(1, "Prior to ADD : TAILINDEX : " + tailIndex);
+			print(1, "Prior to ADD FIRST : CAPACITY : " + capacity);
+			print(1, "Prior to ADD FIRST : HEADCURSOR : " + headCursor);
+			print(1, "Prior to ADD FIRST : TAILINDEX : " + tailIndex);
 		}
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "Prior to ADD : SIZE : " + size + " ADDING " + entry + "(" + entry.getClass().toString() + ")");
+			print(1, "Prior to ADD FIRST : SIZE : " + size + " ADDING " + entry + "(" + entry.getClass().toString() + ")");
 		}
 		// END DEBUG
 
@@ -150,17 +149,16 @@ public class JayList<T> implements Queue<T>, Stack<T>
 			concurrentSize++;
 		}
 
-
 		// DEBUG
 		if(keyword == IDDEBUG)
 		{
-			print(1, "After ADD : CAPACITY : " + capacity);
-			print(1, "After ADD : HEADCURSOR : " + headCursor);
-			print(1, "After ADD : TAILINDEX : " + tailIndex);
+			print(1, "After ADD FIRST : CAPACITY : " + capacity);
+			print(1, "After ADD FIRST : HEADCURSOR : " + headCursor);
+			print(1, "After ADD FIRST : TAILINDEX : " + tailIndex);
 		}
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "After ADD : SIZE : " + size + " ADDED " + entry + "(" + entry.getClass().toString() + ")");
+			print(1, "After ADD FIRST : SIZE : " + size + " ADDED " + entry + "(" + entry.getClass().toString() + ")");
 		}
 		// END DEBUG
 
@@ -171,84 +169,88 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	@param entry An entry to be added.
-	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@param entry An entry to be added.
+		@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public T push(T entry)
+	public T addLast(T entry)
 	{
-		return push(entry, NULL);
+		return addLast(entry, NULL);
 	}
 	/**
-	*	Bottleneck synchronized with this.
-	*
-	*	@param entry An entry to be added.
-	*	@param keyword Used for development.
-	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
-	*	@throws IllegalArgumentException when entry is null.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		Bottleneck synchronized with this.
+
+		@param entry An entry to be added.
+		@param keyword Used for development.
+		@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
+		@throws IllegalArgumentException when entry is null.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized T push(T entry, Keyword keyword)
+	public synchronized T addLast(T entry, Keyword keyword)
 	{
-		return add(entry, keyword);
+		if(entry == null)
+			throw new IllegalArgumentException();
 
-		// if(entry == null)
-		// 	throw new IllegalArgumentException();
-
-		// // DEBUG
-		// if(keyword == IDDEBUG)
-		// {
-		// 	print(1, "\n\nIDDEBUG ENABLED");
-		// 	print(1, "Prior to PUSH : CAPACITY : " + capacity);
-		// 	print(1, "Prior to PUSH : HEADCURSOR : " + headCursor);
-		// 	print(1, "Prior to PUSH : TAILINDEX : " + tailIndex);
-		// }
-		// if(keyword == DEBUG || keyword == IDDEBUG)
-		// {
-		// 	print(1, "Prior to PUSH : SIZE : " + size + " PUSHING " + entry + "(" + entry.getClass().toString() + ")");
-		// }
-		// // END DEBUG
+		// DEBUG
+		if(keyword == IDDEBUG)
+		{
+			print(1, "Prior to ADD LAST : CAPACITY : " + capacity);
+			print(1, "Prior to ADD LAST : HEADCURSOR : " + headCursor);
+			print(1, "Prior to ADD LAST : TAILINDEX : " + tailIndex);
+		}
+		if(keyword == DEBUG || keyword == IDDEBUG)
+		{
+			print(1, "Prior to ADD LAST : SIZE : " + size + " ADDING " + entry + "(" + entry.getClass().toString() + ")");
+		}
+		// END DEBUG
 
 
-		// // add the entry to the headCursor position and increment headCursor using modulo.
-		// checkInitialization();
-		// if(isFull())
-		// 	increaseCapacity(EXPANSION_FACTOR, keyword);
-		// jayList[(tailIndex - 1) % capacity] = entry;
-		// tailIndex = (tailIndex - 1) % capacity;
-		// size++;
-		// synchronized(this.getClass())
-		// {
-		// 	concurrentSize++;
-		// }
+		checkInitialization();
+		if(isFull())
+			increaseCapacity(EXPANSION_FACTOR, keyword);
+
+		if(tailIndex == 0)
+		{
+			tailIndex = capacity - 1;
+			jayList[tailIndex] = entry;
+		}
+		else
+		{
+			jayList[--tailIndex] = entry;
+		}
+		size++;
+		synchronized(this.getClass())
+		{
+			concurrentSize++;
+		}
 
 
-		// // DEBUG
-		// if(keyword == IDDEBUG)
-		// {
-		// 	print(1, "After PUSH : CAPACITY : " + capacity);
-		// 	print(1, "After PUSH : HEADCURSOR : " + headCursor);
-		// 	print(1, "After PUSH : TAILINDEX : " + tailIndex);
-		// }
-		// if(keyword == DEBUG || keyword == IDDEBUG)
-		// {
-		// 	print(1, "After PUSH : SIZE : " + size + " PUSHED " + entry + "(" + entry.getClass().toString() + ")");
-		// }
-		// // END DEBUG
+		// DEBUG
+		if(keyword == IDDEBUG)
+		{
+			print(1, "After ADD LAST : CAPACITY : " + capacity);
+			print(1, "After ADD LAST : HEADCURSOR : " + headCursor);
+			print(1, "After ADD LAST : TAILINDEX : " + tailIndex);
+		}
+		if(keyword == DEBUG || keyword == IDDEBUG)
+		{
+			print(1, "After ADD LAST : SIZE : " + size + " ADDED " + entry + "(" + entry.getClass().toString() + ")");
+		}
+		// END DEBUG
 
-		// return jayList[tailIndex];
+		return jayList[tailIndex];
 	}
 
 
 	// /**
-	// *	@param entry An entry to be added.
-	// *	@param position The index at which the entry will be inserted into.
-	// *	@throws IllegalStateException when this has not been properly initialized.
-	// *	@throws IllegalArgumentException when entry cannot be added due to a predetermined maximum capacity.
-	// *	@since 1.0.0
-	// *	@author Jaewan Yun (Jay50@pitt.edu)
+	// 	@param entry An entry to be added.
+	// 	@param position The index at which the entry will be inserted into.
+	// 	@throws IllegalStateException when this has not been properly initialized.
+	// 	@throws IllegalArgumentException when entry cannot be added due to a predetermined maximum capacity.
+	// 	@since 1.0.0
+	// 	@author Jaewan Yun (Jay50@pitt.edu)
 	// */
 	// public synchronized void add(T entry, int position)
 	// {
@@ -258,26 +260,26 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	// }
 
 	/**
-	*	@return the element that was removed.
-	*	@throws IllegalArgumentException if data structure is empty.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@return the element that was removed.
+		@throws IllegalArgumentException if data structure is empty.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public T remove()
+	public T removeLast()
 	{
-		return remove(NULL);
+		return removeLast(NULL);
 	}
 	/**
-	*	Bottleneck synchronized with this.
-	*
-	*	@param keyword Used for development.
-	*	@return the element that was removed.
-	*	@throws NoSuchElementException if data structure is empty.
-	*	@throws NullPointerException if removed value is null.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		Bottleneck synchronized with this.
+
+		@param keyword Used for development.
+		@return the element that was removed.
+		@throws NoSuchElementException if data structure is empty.
+		@throws NullPointerException if removed value is null.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized T remove(Keyword keyword)
+	public synchronized T removeLast(Keyword keyword)
 	{
 		// check that data structure is non-empty
 		if(isEmpty())
@@ -287,14 +289,13 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		// DEBUG
 		if(keyword == IDDEBUG)
 		{
-			print(1, "\n\nIDDEBUG ENABLED");
-			print(1, "Prior to REMOVE : CAPACITY : " + capacity);
-			print(1, "Prior to REMOVE : HEADCURSOR : " + headCursor);
-			print(1, "Prior to REMOVE : TAILINDEX : " + tailIndex);
+			print(1, "Prior to REMOVE LAST : CAPACITY : " + capacity);
+			print(1, "Prior to REMOVE LAST : HEADCURSOR : " + headCursor);
+			print(1, "Prior to REMOVE LAST : TAILINDEX : " + tailIndex);
 		}
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "Prior to REMOVE : SIZE : " + size + " REMOVING " + jayList[tailIndex] + "(" + jayList[tailIndex].getClass().toString() + ")");
+			print(1, "Prior to REMOVE LAST : SIZE : " + size + " REMOVING " + jayList[tailIndex] + "(" + jayList[tailIndex].getClass().toString() + ")");
 		}
 		// END DEBUG
 
@@ -313,7 +314,7 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		// DEBUG
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "After REMOVE : SIZE : " + size + " REMOVED " + toReturn + "(" + toReturn.getClass().toString() + ")");
+			print(1, "After REMOVE LAST : SIZE : " + size + " REMOVED " + toReturn + "(" + toReturn.getClass().toString() + ")");
 		}
 		// END DEBUG
 
@@ -326,9 +327,9 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		// // DEBUG
 		if(keyword == IDDEBUG)
 		{
-			print(1, "After REMOVE : CAPACITY : " + capacity);
-			print(1, "After REMOVE : HEADCURSOR : " + headCursor);
-			print(1, "After REMOVE : TAILINDEX : " + tailIndex);
+			print(1, "After REMOVE LAST : CAPACITY : " + capacity);
+			print(1, "After REMOVE LAST : HEADCURSOR : " + headCursor);
+			print(1, "After REMOVE LAST : TAILINDEX : " + tailIndex);
 		}
 		// // END DEBUG
 
@@ -338,26 +339,26 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	@return the element that was popped.
-	*	@throws IllegalArgumentException if data structure is empty.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@return the element that was popped.
+		@throws IllegalArgumentException if data structure is empty.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public T pop()
+	public T removeFirst()
 	{
-		return pop(NULL);
+		return removeFirst(NULL);
 	}
 	/**
-	*	Bottleneck synchronized with this.
-	*
-	*	@param keyword Used for development.
-	*	@return the element that was popped.
-	*	@throws NoSuchElementException if data structure is empty.
-	*	@throws NullPointerException if popped value is null.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		Bottleneck synchronized with this.
+
+		@param keyword Used for development.
+		@return the element that was popped.
+		@throws NoSuchElementException if data structure is empty.
+		@throws NullPointerException if popped value is null.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized T pop(Keyword keyword)
+	public synchronized T removeFirst(Keyword keyword)
 	{
 		// check that data structure is non-empty
 		if(isEmpty())
@@ -367,22 +368,29 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		// DEBUG
 		if(keyword == IDDEBUG)
 		{
-			print(1, "\n\nIDDEBUG ENABLED");
-			print(1, "Prior to POP : CAPACITY : " + capacity);
-			print(1, "Prior to POP : HEADCURSOR : " + headCursor);
-			print(1, "Prior to POP : TAILINDEX : " + tailIndex);
+			print(1, "Prior to REMOVE FIRST: CAPACITY : " + capacity);
+			print(1, "Prior to REMOVE FIRST: HEADCURSOR : " + headCursor);
+			print(1, "Prior to REMOVE FIRST: TAILINDEX : " + tailIndex);
 		}
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "Prior to POP : SIZE : " + size + " POPPING " + jayList[tailIndex] + "(" + jayList[tailIndex].getClass().toString() + ")");
+			print(1, "Prior to REMOVE FIRST: SIZE : " + size + " REMOVING " + jayList[tailIndex] + "(" + jayList[tailIndex].getClass().toString() + ")");
 		}
 		// END DEBUG
 
 
-		// remove an item from the tailIndex and increment tailIndex using modulo.
-		T toReturn = jayList[(headCursor - 1) % capacity];
-		jayList[(headCursor - 1) % capacity] = null;
-		headCursor = (headCursor - 1) % capacity;
+		T toReturn;
+		if(headCursor == 0)
+		{
+			headCursor = capacity - 1;
+			toReturn = jayList[headCursor];
+			jayList[headCursor] = null;
+		}
+		else
+		{
+			toReturn = jayList[--headCursor];
+			jayList[headCursor] = null;
+		}
 		size--;
 		synchronized(this.getClass())
 		{
@@ -393,7 +401,7 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		// DEBUG
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "After POP : SIZE : " + size + " POPPED " + toReturn + "(" + toReturn.getClass().toString() + ")");
+			print(1, "After REMOVE FIRST: SIZE : " + size + " REMOVED " + toReturn + "(" + toReturn.getClass().toString() + ")");
 		}
 		// END DEBUG
 
@@ -406,9 +414,9 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		// // DEBUG
 		if(keyword == IDDEBUG)
 		{
-			print(1, "After POP : CAPACITY : " + capacity);
-			print(1, "After POP : HEADCURSOR : " + headCursor);
-			print(1, "After POP : TAILINDEX : " + tailIndex);
+			print(1, "After REMOVE FIRST : CAPACITY : " + capacity);
+			print(1, "After REMOVE FIRST : HEADCURSOR : " + headCursor);
+			print(1, "After REMOVE FIRST : TAILINDEX : " + tailIndex);
 		}
 		// // END DEBUG
 
@@ -418,27 +426,27 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	@return the element that is next in queue.
-	*	@throws NoSuchElementException if data structure is empty.
-	*	@throws NullPointerException if next value is null.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@return the element that is next in queue.
+		@throws NoSuchElementException if data structure is empty.
+		@throws NullPointerException if next value is null.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public T element()
+	public T getLast()
 	{
-		return element(NULL);
+		return getLast(NULL);
 	}
 	/**
-	*	Bottleneck synchronized with this.
-	*
-	*	@param keyword Used for development.
-	*	@return the element that is next in queue.
-	*	@throws NoSuchElementException if data structure is empty.
-	*	@throws NullPointerException if next value is null.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		Bottleneck synchronized with this.
+
+		@param keyword Used for development.
+		@return the element that is next in queue.
+		@throws NoSuchElementException if data structure is empty.
+		@throws NullPointerException if next value is null.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized T element(Keyword keyword)
+	public synchronized T getLast(Keyword keyword)
 	{
 		// check that data structure is non-empty
 		if(isEmpty())
@@ -448,7 +456,6 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		// DEBUG
 		if(keyword == IDDEBUG)
 		{
-			print(1, "\n\nIDDEBUG ENABLED");
 			print(1, "Prior to ELEMENT : CAPACITY : " + capacity);
 			print(1, "Prior to ELEMENT : HEADCURSOR : " + headCursor);
 			print(1, "Prior to ELEMENT : TAILINDEX : " + tailIndex);
@@ -484,27 +491,27 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	@return the element that is next in stack.
-	*	@throws NoSuchElementException if data structure is empty.
-	*	@throws NullPointerException if next value is null.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@return the element that is next in stack.
+		@throws NoSuchElementException if data structure is empty.
+		@throws NullPointerException if next value is null.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public T peek()
+	public T getFirst()
 	{
-		return peek(NULL);
+		return getFirst(NULL);
 	}
 	/**
-	*	Bottleneck synchronized with this.
-	*
-	*	@param keyword Used for development.
-	*	@return the element that is next in stack.
-	*	@throws NoSuchElementException if data structure is empty.
-	*	@throws NullPointerException if next value is null.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		Bottleneck synchronized with this.
+
+		@param keyword Used for development.
+		@return the element that is next in stack.
+		@throws NoSuchElementException if data structure is empty.
+		@throws NullPointerException if next value is null.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized T peek(Keyword keyword)
+	public synchronized T getFirst(Keyword keyword)
 	{
 		// check that data structure is non-empty
 		if(isEmpty())
@@ -514,7 +521,6 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		// DEBUG
 		if(keyword == IDDEBUG)
 		{
-			print(1, "\n\nIDDEBUG ENABLED");
 			print(1, "Prior to PEEK : CAPACITY : " + capacity);
 			print(1, "Prior to PEEK : HEADCURSOR : " + headCursor);
 			print(1, "Prior to PEEK : TAILINDEX : " + tailIndex);
@@ -550,13 +556,13 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	Client method needs to ensure synchronization with this.
-	*
-	*	@param factor The multiplicative expansion coefficient.
-	*	@param keyword Used for development.
-	*	@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		Client method needs to ensure synchronization with this.
+
+		@param factor The multiplicative expansion coefficient.
+		@param keyword Used for development.
+		@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	private void increaseCapacity(double factor, Keyword keyword)
 	{
@@ -617,12 +623,12 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	Client method needs to ensure synchronization with this.
-	*
-	*	@param factor The multiplicative reduction coefficient.
-	*	@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		Client method needs to ensure synchronization with this.
+
+		@param factor The multiplicative reduction coefficient.
+		@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	private void decreaseCapacity(double factor, Keyword keyword)
 	{
@@ -704,8 +710,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized void clear()
 	{
@@ -727,14 +733,14 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	Client method needs to ensure synchronization with this.
-	*
-	*	@param input An array used as a template.
-	*	@return true when storage was successful, and false if otherwise.
-	*	@throws IllegalStateException when this has not been properly initialized.
-	*	@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		Client method needs to ensure synchronization with this.
+
+		@param input An array used as a template.
+		@return true when storage was successful, and false if otherwise.
+		@throws IllegalStateException when this has not been properly initialized.
+		@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	private boolean storeArray(T[] input)
 	{
@@ -793,10 +799,10 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	// /**
-	// *	Sets capacity to a minimal value and tailIndex is shifted to array index of zero.
+	// 	Sets capacity to a minimal value and tailIndex is shifted to array index of zero.
 	// *
-	// *	@since 1.0.0
-	// *	@author Jaewan Yun (Jay50@pitt.edu)
+	// 	@since 1.0.0
+	// 	@author Jaewan Yun (Jay50@pitt.edu)
 	// */
 	// private synchronized void normalize()
 	// {
@@ -814,11 +820,11 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	// }
 
 	/**
-	*	@return A copy of this array.
-	*	@throws IllegalStateException when this has not been properly initialized.
-	*	@throws NullPointerException when jayList is null.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@return A copy of this array.
+		@throws IllegalStateException when this has not been properly initialized.
+		@throws NullPointerException when jayList is null.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	@SuppressWarnings("unchecked") public synchronized T[] toArray()
 	{
@@ -833,12 +839,12 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	@param toCopy An array used as a template.
-	*	@return A copy of the accepted array.
-	*	@throws NullPointerException when the accepted array is null.
-	*	@throws IllegalArgumentException when the size of the accepted array exceeds a predetermined maximum capacity.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@param toCopy An array used as a template.
+		@return A copy of the accepted array.
+		@throws NullPointerException when the accepted array is null.
+		@throws IllegalArgumentException when the size of the accepted array exceeds a predetermined maximum capacity.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	@SuppressWarnings("unchecked") private T[] copyOf(T[] toCopy)
 	{
@@ -865,14 +871,14 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	Client method needs to ensure synchronization with this.
-	*
-	*	@param capacity The capacity of the array to be constructed.
-	*	@return Initialized array of T types with the accepted value as its capacity.
-	*	@throws IllegalArgumentException when the size of the accepted value exceeds a predetermined maximum capacity.
-	* 	@throws IllegalArgumentException when the size of the accepted value is less than one.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		Client method needs to ensure synchronization with this.
+
+		@param capacity The capacity of the array to be constructed.
+		@return Initialized array of T types with the accepted value as its capacity.
+		@throws IllegalArgumentException when the size of the accepted value exceeds a predetermined maximum capacity.
+		@throws IllegalArgumentException when the size of the accepted value is less than one.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	@SuppressWarnings("unchecked") private T[] constructArray(int capacity)
 	{
@@ -890,11 +896,11 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	Client method needs to ensure synchronization with this.
-	*
-	*	@throws IllegalStateException when this has not been properly initialized.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		Client method needs to ensure synchronization with this.
+
+		@throws IllegalStateException when this has not been properly initialized.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	private void checkInitialization()
 	{
@@ -905,11 +911,11 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	Client method needs to ensure synchronization with this.
-	*
-	*	@return true if no elements exist in this data structure.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		Client method needs to ensure synchronization with this.
+
+		@return true if no elements exist in this data structure.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public boolean isEmpty()
 	{
@@ -919,11 +925,11 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	Client method needs to ensure synchronization with this.
-	*
-	*	@return true if data represented is in full state.
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		Client method needs to ensure synchronization with this.
+
+		@return true if data represented is in full state.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	private boolean isFull()
 	{
@@ -933,8 +939,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	protected void finalize()
 	{
@@ -950,8 +956,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized String toString()
 	{
@@ -959,9 +965,9 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	@param keyword Keyword that the method body portion execution is dependent on
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@param keyword Keyword that the method body portion execution is dependent on
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized void showState(Keyword keyword)
 	{
@@ -1022,8 +1028,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	private void print(int skip, String toPrint)
 	{

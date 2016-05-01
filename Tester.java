@@ -39,51 +39,69 @@ public class Tester
 			}
 		}
 
-		for(int j = 0; j < size; j++)
-		{
-			System.out.print(list.add(alist[j]) + " ");//, DEBUG);
-		}
-		System.out.println();
-		list.showState(DEBUG);
+		/////////////////////////////////////////////////////////////////////////////////////
 
 		for(int j = 0; j < size; j++)
 		{
-			System.out.print(list.remove() + " ");
+			System.out.print(list.addFirst(alist[j]) + " ");//, DEBUG);
 		}
-		System.out.println();
-		list.showState(DEBUG);
+		System.out.println("\n\n\t\t\tADD FIRST");
+		list.showState(IDDEBUG);
+
+		for(int j = 0; j < size - 50; j++)
+		{
+			System.out.print(list.removeLast() + " ");
+		}
+		System.out.println("\n\n\t\t\tREMOVE LAST");
+		list.showState(IDDEBUG);
 
 		System.out.println("\n1)----------------------------------------------------------");
 
 		for(int j = 0; j < size; j++)
 		{
-			System.out.print(list.add(alist[j]) + " ");//, DEBUG);
+			System.out.print(list.addLast(alist[j]) + " ");//, DEBUG);
 		}
-		System.out.println();
-		list.showState(DEBUG);
+		System.out.println("\n\n\t\t\tADD LAST");
+		list.showState(IDDEBUG);
 
-		for(int j = 0; j < size - 10; j++)
+		for(int j = 0; j < size + 50; j++)
 		{
-			System.out.print(list.remove() + " ");
+			System.out.print(list.removeFirst() + " ");
 		}
-		System.out.println();
+		System.out.println("\n\n\t\t\tREMOVE FIRST");
 		list.showState(IDDEBUG);
 
 		System.out.println("\n2)----------------------------------------------------------");
 
 		for(int j = 0; j < size; j++)
 		{
-			System.out.print(list.add(alist[j]) + " ");//, DEBUG);
+			System.out.print(list.addFirst(alist[j]) + " ");//, DEBUG);
 		}
-		System.out.println();
+		System.out.println("\n\n\t\t\tADD FIRST");
 		list.showState(IDDEBUG);
+
+		for(int j = 0; j < size - 50; j++)
+		{
+			System.out.print(list.removeFirst() + " ");
+		}
+		System.out.println("\n\n\t\t\tREMOVE FIRST");
+		list.showState(IDDEBUG);
+
+		System.out.println("\n3)----------------------------------------------------------");
 
 		for(int j = 0; j < size; j++)
 		{
-			System.out.print(list.pop() + " ");
+			System.out.print(list.addLast(alist[j]) + " ");//, DEBUG);
 		}
-		System.out.println();
-		list.showState(DEBUG);
+		System.out.println("\n\n\t\t\tADD LAST");
+		list.showState(IDDEBUG);
+
+		for(int j = 0; j < size + 50; j++)
+		{
+			System.out.print(list.removeLast() + " ");
+		}
+		System.out.println("\n\n\t\t\tREMOVE LAST");
+		list.showState(IDDEBUG);
 
 		// // list.remove();
 
