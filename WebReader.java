@@ -14,17 +14,9 @@ public class WebReader
 {
 	public static void main(String[] args)
 	{
-		JaeList<String> jaeList = new JaeList<String>();
+		JayList<String> jayList = new JayList<String>();
 		String a = "www.nasdaq.com/markets/indices/sector-indices.aspx";
 		// String a = "www.nasdaq.com/markets/indices/major-indices.aspx";
-
-		if(args.length != 0)
-		{
-			Scanner sc = new Scanner(System.in);
-			System.out.print("Enter an address (e.g. www.google.com) > ");
-			args = new String[1];
-			args[0] = sc.nextLine();
-		}
 
 		try
 		{
@@ -41,9 +33,6 @@ public class WebReader
 
 			String[] temp = body.split("</tr>");
 
-			// DEBUG
-			System.out.println("LENGTH OF FIRST CUT > " + temp.length);
-
 			for(int j = 0; j < temp.length; j++)
 			{
 				for(String temp2 : temp[j].split("\n"))
@@ -56,7 +45,7 @@ public class WebReader
 
 					if(read == true && counter < 8)
 					{
-						jaeList.add(temp2);
+						jayList.addFirst(temp2);
 					}
 
 					counter++;
@@ -64,8 +53,6 @@ public class WebReader
 				}
 			}
 
-			// DEBUG
-			System.out.println("NUMBER OF LINES > " + line);
 			// System.out.println(body);
 		}
 		catch(Exception e)
@@ -73,16 +60,9 @@ public class WebReader
 			e.printStackTrace();
 		}
 
-		try
+		for(int j = 0, k = jayList.size(); j < k; j++)
 		{
-			while(true)
-			{
-				System.out.println(jaeList.remove());
-			}
-		}
-		catch(Exception e)
-		{
-
+				System.out.println(jayList.removeLast());
 		}
 	}
 }

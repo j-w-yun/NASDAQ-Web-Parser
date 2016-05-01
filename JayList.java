@@ -1,15 +1,15 @@
 /**
-	A circular implementation of an array-based deque.
-
-	@author Jaewan Yun (Jay50@pitt.edu)
-	@version 1.0.0
+*	A circular implementation of an array-based deque.
+*
+*	@author Jaewan Yun (Jay50@pitt.edu)
+*	@version 1.0.0
 */
 
 import java.util.*;
 import constant.*;
 import static constant.Keyword.*;
 
-public class JayList<T> implements Deque<T>
+public class JayList<T> implements MyDeque<T>
 {
 	// underlying data structure.
 	private volatile T[] jayList = null;
@@ -38,8 +38,8 @@ public class JayList<T> implements Deque<T>
 	private volatile int tailIndex = 0;
 
 	/**
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public JayList()
 	{
@@ -57,11 +57,11 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@param capacity The desired capacity of the underlying data structure.
-		@throws IllegalArgumentException when the size of the accepted value exceeds a predetermined maximum capacity.
-		@throws IllegalArgumentException when the size of the accepted value is less than one.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@param capacity The desired capacity of the underlying data structure.
+	*	@throws IllegalArgumentException when the size of the accepted value exceeds a predetermined maximum capacity.
+	*	@throws IllegalArgumentException when the size of the accepted value is less than one.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public JayList(int capacity)
 	{
@@ -79,10 +79,10 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@param input An array used as a template.
-		@return true when storage was successful, and false if otherwise.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@param input An array used as a template.
+	*	@return true when storage was successful, and false if otherwise.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public JayList(T[] input)
 	{
@@ -98,24 +98,24 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@param entry An entry to be added.
-		@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@param entry An entry to be added.
+	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public T addFirst(T entry)
 	{
 		return addFirst(entry, NULL);
 	}
 	/**
-		Bottleneck synchronized with this.
-
-		@param entry An entry to be added.
-		@param keyword Used for development.
-		@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
-		@throws IllegalArgumentException when entry is null.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Bottleneck synchronized with this.
+	*
+	*	@param entry An entry to be added.
+	*	@param keyword Used for development.
+	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
+	*	@throws IllegalArgumentException when entry is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized T addFirst(T entry, Keyword keyword)
 	{
@@ -168,24 +168,24 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@param entry An entry to be added.
-		@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@param entry An entry to be added.
+	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public T addLast(T entry)
 	{
 		return addLast(entry, NULL);
 	}
 	/**
-		Bottleneck synchronized with this.
-
-		@param entry An entry to be added.
-		@param keyword Used for development.
-		@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
-		@throws IllegalArgumentException when entry is null.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Bottleneck synchronized with this.
+	*
+	*	@param entry An entry to be added.
+	*	@param keyword Used for development.
+	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
+	*	@throws IllegalArgumentException when entry is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized T addLast(T entry, Keyword keyword)
 	{
@@ -259,24 +259,24 @@ public class JayList<T> implements Deque<T>
 	// }
 
 	/**
-		@return the element that was removed.
-		@throws IllegalArgumentException if data structure is empty.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@return the element that was removed.
+	*	@throws IllegalArgumentException if data structure is empty.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public T removeLast()
 	{
 		return removeLast(NULL);
 	}
 	/**
-		Bottleneck synchronized with this.
-
-		@param keyword Used for development.
-		@return the element that was removed.
-		@throws NoSuchElementException if data structure is empty.
-		@throws NullPointerException if removed value is null.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Bottleneck synchronized with this.
+	*
+	*	@param keyword Used for development.
+	*	@return the element that was removed.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if removed value is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized T removeLast(Keyword keyword)
 	{
@@ -338,24 +338,24 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@return the element that was popped.
-		@throws IllegalArgumentException if data structure is empty.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@return the element that was popped.
+	*	@throws IllegalArgumentException if data structure is empty.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public T removeFirst()
 	{
 		return removeFirst(NULL);
 	}
 	/**
-		Bottleneck synchronized with this.
-
-		@param keyword Used for development.
-		@return the element that was popped.
-		@throws NoSuchElementException if data structure is empty.
-		@throws NullPointerException if popped value is null.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Bottleneck synchronized with this.
+	*
+	*	@param keyword Used for development.
+	*	@return the element that was popped.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if popped value is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized T removeFirst(Keyword keyword)
 	{
@@ -425,25 +425,25 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@return the element that is next in queue.
-		@throws NoSuchElementException if data structure is empty.
-		@throws NullPointerException if next value is null.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@return the element that is next in queue.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if next value is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public T getLast()
 	{
 		return getLast(NULL);
 	}
 	/**
-		Bottleneck synchronized with this.
-
-		@param keyword Used for development.
-		@return the element that is next in queue.
-		@throws NoSuchElementException if data structure is empty.
-		@throws NullPointerException if next value is null.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Bottleneck synchronized with this.
+	*
+	*	@param keyword Used for development.
+	*	@return the element that is next in queue.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if next value is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized T getLast(Keyword keyword)
 	{
@@ -490,25 +490,25 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@return the element that is next in stack.
-		@throws NoSuchElementException if data structure is empty.
-		@throws NullPointerException if next value is null.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@return the element that is next in stack.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if next value is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public T getFirst()
 	{
 		return getFirst(NULL);
 	}
 	/**
-		Bottleneck synchronized with this.
-
-		@param keyword Used for development.
-		@return the element that is next in stack.
-		@throws NoSuchElementException if data structure is empty.
-		@throws NullPointerException if next value is null.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Bottleneck synchronized with this.
+	*
+	*	@param keyword Used for development.
+	*	@return the element that is next in stack.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if next value is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized T getFirst(Keyword keyword)
 	{
@@ -555,13 +555,13 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		Client method needs to ensure synchronization with this.
-
-		@param factor The multiplicative expansion coefficient.
-		@param keyword Used for development.
-		@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Client method needs to ensure synchronization with this.
+	*
+	*	@param factor The multiplicative expansion coefficient.
+	*	@param keyword Used for development.
+	*	@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	private void increaseCapacity(double factor, Keyword keyword)
 	{
@@ -622,12 +622,12 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		Client method needs to ensure synchronization with this.
-
-		@param factor The multiplicative reduction coefficient.
-		@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Client method needs to ensure synchronization with this.
+	*
+	*	@param factor The multiplicative reduction coefficient.
+	*	@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	private void decreaseCapacity(double factor, Keyword keyword)
 	{
@@ -709,8 +709,8 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized void clear()
 	{
@@ -736,14 +736,14 @@ public class JayList<T> implements Deque<T>
 		return setArray(input, input.length);
 	}
 	/**
-		Client method needs to ensure synchronization with this.
-
-		@param input An array used as a template.
-		@return true when storage was successful, and false if otherwise.
-		@throws IllegalStateException when this has not been properly initialized.
-		@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Client method needs to ensure synchronization with this.
+	*
+	*	@param input An array used as a template.
+	*	@return true when storage was successful, and false if otherwise.
+	*	@throws IllegalStateException when this has not been properly initialized.
+	*	@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	private boolean setArray(T[] input, int length)
 	{
@@ -811,11 +811,11 @@ public class JayList<T> implements Deque<T>
 	// }
 
 	/**
-		@return A copy of this array.
-		@throws IllegalStateException when this has not been properly initialized.
-		@throws NullPointerException when jayList is null.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@return A copy of this array.
+	*	@throws IllegalStateException when this has not been properly initialized.
+	*	@throws NullPointerException when jayList is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	@SuppressWarnings("unchecked") public synchronized T[] toArray()
 	{
@@ -830,12 +830,12 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@param toCopy An array used as a template.
-		@return A copy of the accepted array.
-		@throws NullPointerException when the accepted array is null.
-		@throws IllegalArgumentException when the size of the accepted array exceeds a predetermined maximum capacity.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@param toCopy An array used as a template.
+	*	@return A copy of the accepted array.
+	*	@throws NullPointerException when the accepted array is null.
+	*	@throws IllegalArgumentException when the size of the accepted array exceeds a predetermined maximum capacity.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	@SuppressWarnings("unchecked") private T[] copyOf(T[] toCopy)
 	{
@@ -862,14 +862,14 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		Client method needs to ensure synchronization with this.
-
-		@param capacity The capacity of the array to be constructed.
-		@return Initialized array of T types with the accepted value as its capacity.
-		@throws IllegalArgumentException when the size of the accepted value exceeds a predetermined maximum capacity.
-		@throws IllegalArgumentException when the size of the accepted value is less than one.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Client method needs to ensure synchronization with this.
+	*
+	*	@param capacity The capacity of the array to be constructed.
+	*	@return Initialized array of T types with the accepted value as its capacity.
+	*	@throws IllegalArgumentException when the size of the accepted value exceeds a predetermined maximum capacity.
+	*	@throws IllegalArgumentException when the size of the accepted value is less than one.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	@SuppressWarnings("unchecked") private T[] constructArray(int capacity)
 	{
@@ -887,11 +887,11 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		Client ensures object types are comparable.
-
-		@throws UnsupportedOperationException if object types are not comparable.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Client ensures object types are comparable.
+	*
+	*	@throws UnsupportedOperationException if object types are not comparable.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized void sort()
 	{
@@ -908,9 +908,9 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@return size The number of elements contained within this data structure.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@return size The number of elements contained within this data structure.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized int size()
 	{
@@ -918,11 +918,11 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		Client method needs to ensure synchronization with this.
-
-		@throws IllegalStateException when this has not been properly initialized.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Client method needs to ensure synchronization with this.
+	*
+	*	@throws IllegalStateException when this has not been properly initialized.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	private void checkInitialization()
 	{
@@ -933,11 +933,11 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		Client method needs to ensure synchronization with this.
-
-		@return true if no elements exist in this data structure.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Client method needs to ensure synchronization with this.
+	*
+	*	@return true if no elements exist in this data structure.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public boolean isEmpty()
 	{
@@ -947,11 +947,11 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		Client method needs to ensure synchronization with this.
-
-		@return true if data represented is in full state.
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	Client method needs to ensure synchronization with this.
+	*
+	*	@return true if data represented is in full state.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	private boolean isFull()
 	{
@@ -961,8 +961,8 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	protected void finalize()
 	{
@@ -978,8 +978,8 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized String toString()
 	{
@@ -987,9 +987,9 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@param keyword Keyword that the method body portion execution is dependent on
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@param keyword Keyword that the method body portion execution is dependent on
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized void showState(Keyword keyword)
 	{
@@ -1050,8 +1050,8 @@ public class JayList<T> implements Deque<T>
 	}
 
 	/**
-		@since 1.0.0
-		@author Jaewan Yun (Jay50@pitt.edu)
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	private void print(int skip, String toPrint)
 	{

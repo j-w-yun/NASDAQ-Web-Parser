@@ -1,4 +1,4 @@
-public interface Deque<T>
+public interface MyDeque<T>
 {
 	T addFirst(T entry);
 	T addLast(T entry);
