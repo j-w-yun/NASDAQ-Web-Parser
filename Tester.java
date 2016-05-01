@@ -9,9 +9,9 @@ public class Tester
 		JayList<Object> list = new JayList<Object>();
 		final int size = 100;//1031;
 
-		Object[] a1 = new Integer[size];
+		Object[] a1 = new Double[size];
 		Object[] a2 = new Double[size];
-		Object[] a3 = new Float[size];
+		Object[] a3 = new Double[size];
 		Object[] alist = new Object[size];
 
 		int counter = 0;
@@ -21,9 +21,9 @@ public class Tester
 			counter %= 3;
 			counter++;
 
-			a1[j] = new Integer(j+1);
-			a2[j] = new Double(j+1);
-			a3[j] = new Float(j+1);
+			a1[j] = new Double(j*9);
+			a2[j] = new Double(j * 9 * 9);
+			a3[j] = new Double(j * 9 * 9 * 9);
 
 			if(counter == 3)
 			{
@@ -46,14 +46,14 @@ public class Tester
 			System.out.print(list.addFirst(alist[j]) + " ");//, DEBUG);
 		}
 		System.out.println("\n\n\t\t\tADD FIRST");
-		list.showState(IDDEBUG);
+		list.showState(DEBUG);
 
 		for(int j = 0; j < size - 50; j++)
 		{
 			System.out.print(list.removeLast() + " ");
 		}
 		System.out.println("\n\n\t\t\tREMOVE LAST");
-		list.showState(IDDEBUG);
+		list.showState(DEBUG);
 
 		System.out.println("\n1)----------------------------------------------------------");
 
@@ -62,14 +62,14 @@ public class Tester
 			System.out.print(list.addLast(alist[j]) + " ");//, DEBUG);
 		}
 		System.out.println("\n\n\t\t\tADD LAST");
-		list.showState(IDDEBUG);
+		list.showState(DEBUG);
 
 		for(int j = 0; j < size + 50; j++)
 		{
 			System.out.print(list.removeFirst() + " ");
 		}
 		System.out.println("\n\n\t\t\tREMOVE FIRST");
-		list.showState(IDDEBUG);
+		list.showState(DEBUG);
 
 		System.out.println("\n2)----------------------------------------------------------");
 
@@ -78,14 +78,14 @@ public class Tester
 			System.out.print(list.addFirst(alist[j]) + " ");//, DEBUG);
 		}
 		System.out.println("\n\n\t\t\tADD FIRST");
-		list.showState(IDDEBUG);
+		list.showState(DEBUG);
 
 		for(int j = 0; j < size - 50; j++)
 		{
 			System.out.print(list.removeFirst() + " ");
 		}
 		System.out.println("\n\n\t\t\tREMOVE FIRST");
-		list.showState(IDDEBUG);
+		list.showState(DEBUG);
 
 		System.out.println("\n3)----------------------------------------------------------");
 
@@ -94,14 +94,21 @@ public class Tester
 			System.out.print(list.addLast(alist[j]) + " ");//, DEBUG);
 		}
 		System.out.println("\n\n\t\t\tADD LAST");
-		list.showState(IDDEBUG);
+		list.showState(DEBUG);
 
-		for(int j = 0; j < size + 50; j++)
+		// for(int j = 0; j < size + 50; j++)
+		// {
+		// 	System.out.print(list.removeLast() + " ");
+		// }
+		// System.out.println("\n\n\t\t\tREMOVE LAST");
+		// list.showState(IDDEBUG);
+
+		list.sort();
+		int k = list.size();
+		for(int j = 0; j < k; j++)
 		{
-			System.out.print(list.removeLast() + " ");
+			System.out.println(list.removeLast());
 		}
-		System.out.println("\n\n\t\t\tREMOVE LAST");
-		list.showState(IDDEBUG);
 
 		// // list.remove();
 

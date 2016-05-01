@@ -13,7 +13,6 @@ public class JayList<T> implements Deque<T>
 {
 	// underlying data structure.
 	private volatile T[] jayList = null;
-	private volatile int[] sorted = null;
 
 	// data structure settings.
 	private final int DEFAULT_CAPACITY = 2;	//e.g. 1024
@@ -90,7 +89,7 @@ public class JayList<T> implements Deque<T>
 		synchronized(this)
 		{
 			initialized = true;
-			storeArray(input);
+			setArray(input, input.length);
 			synchronized(this.getClass())
 			{
 				concurrentObjects++;
@@ -732,6 +731,10 @@ public class JayList<T> implements Deque<T>
 		tailIndex = 0;
 	}
 
+	public synchronized boolean setArray(T[] input)
+	{
+		return setArray(input, input.length);
+	}
 	/**
 		Client method needs to ensure synchronization with this.
 
@@ -742,7 +745,7 @@ public class JayList<T> implements Deque<T>
 		@since 1.0.0
 		@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	private boolean storeArray(T[] input)
+	private boolean setArray(T[] input, int length)
 	{
 		checkInitialization();
 
@@ -751,28 +754,16 @@ public class JayList<T> implements Deque<T>
 			return false;
 		}
 
-		if(jayList == null)
-		{
-			synchronized(this.getClass())
-			{
-				jayList = constructArray(input.length);
-				capacity = input.length;
-				concurrentCapacity += input.length;
-			}
-		}
-
-		if(input.length > MAX_CAPACITY)
+		if(length + 1 > MAX_CAPACITY)
 			throw new IllegalArgumentException();
 
-		if(input.length >= jayList.length)
+
+		jayList = constructArray(length + 1);
+		capacity = length + 1;
+		synchronized(this.getClass())
 		{
-			synchronized(this.getClass())
-			{
-				jayList = constructArray(input.length);
-				capacity = input.length;
-				concurrentCapacity -= jayList.length;
-				concurrentCapacity += input.length;
-			}
+			concurrentCapacity -= jayList.length;
+			concurrentCapacity += length + 1;
 		}
 
 		// copy references
@@ -781,7 +772,7 @@ public class JayList<T> implements Deque<T>
 			concurrentSize -= size;
 			size = 0;
 		}
-		for(int j = 0; j < input.length; j++)
+		for(int j = 0; j < length; j++)
 		{
 			if(input[j] != null)
 			{
@@ -794,7 +785,7 @@ public class JayList<T> implements Deque<T>
 			concurrentSize += size;
 		}
 		tailIndex = 0;
-		headCursor = size;
+		headCursor = length;
 		return true;
 	}
 
@@ -893,6 +884,37 @@ public class JayList<T> implements Deque<T>
 		// setting the states
 		initialized = true;
 		return toReturn;
+	}
+
+	/**
+		Client ensures object types are comparable.
+
+		@throws UnsupportedOperationException if object types are not comparable.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public synchronized void sort()
+	{
+		try
+		{
+			T[] a = toArray();
+			Arrays.sort(a);
+			setArray(a);
+		}
+		catch(Exception e)
+		{
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	/**
+		@return size The number of elements contained within this data structure.
+		@since 1.0.0
+		@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public synchronized int size()
+	{
+		return size;
 	}
 
 	/**
