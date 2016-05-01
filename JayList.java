@@ -1,5 +1,5 @@
 /**
-*	A thread-safe circular implementation of an array-based abstract data structure with capabilities of first-in-first-out and
+*	A circular implementation of an array-based abstract data structure with capabilities of first-in-first-out and
 *	first-in-last-out.
 *
 *	@author Jaewan Yun (Jay50@pitt.edu)
@@ -32,7 +32,7 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	private volatile int size = 0;
 	private volatile int capacity = 0;
 
-	private boolean initialized = false;
+	private volatile boolean initialized = false;
 
 	// note that cursor does not indicate index.
 	private volatile int headCursor = 0;
@@ -44,13 +44,16 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	*/
 	public JayList()
 	{
-		jayList = constructArray(DEFAULT_CAPACITY);
-		capacity = DEFAULT_CAPACITY;
-		initialized = true;
-		synchronized(this.getClass())
+		synchronized(this)
 		{
-			concurrentCapacity += DEFAULT_CAPACITY;
-			concurrentObjects++;
+			initialized = true;
+			jayList = constructArray(DEFAULT_CAPACITY);
+			capacity = DEFAULT_CAPACITY;
+			synchronized(this.getClass())
+			{
+				concurrentCapacity += DEFAULT_CAPACITY;
+				concurrentObjects++;
+			}
 		}
 	}
 
@@ -63,13 +66,16 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	*/
 	public JayList(int capacity)
 	{
-		jayList = constructArray(capacity);
-		this.capacity = capacity;
-		initialized = true;
-		synchronized(this.getClass())
+		synchronized(this)
 		{
-			concurrentCapacity += capacity;
-			concurrentObjects++;
+			initialized = true;
+			jayList = constructArray(capacity);
+			this.capacity = capacity;
+			synchronized(this.getClass())
+			{
+				concurrentCapacity += capacity;
+				concurrentObjects++;
+			}
 		}
 	}
 
@@ -81,11 +87,14 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	*/
 	public JayList(T[] input)
 	{
-		storeArray(input);
-		initialized = true;
-		synchronized(this.getClass())
+		synchronized(this)
 		{
-			concurrentObjects++;
+			initialized = true;
+			storeArray(input);
+			synchronized(this.getClass())
+			{
+				concurrentObjects++;
+			}
 		}
 	}
 
@@ -100,6 +109,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		return add(entry, NULL);
 	}
 	/**
+	*	Bottleneck synchronized with this.
+	*
 	*	@param entry An entry to be added.
 	*	@param keyword Used for development.
 	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
@@ -153,7 +164,10 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		}
 		// END DEBUG
 
-		return jayList[(headCursor - 1) % capacity];
+		if(headCursor == 0)
+			return jayList[capacity - 1];
+		else
+			return jayList[headCursor - 1];
 	}
 
 	/**
@@ -167,6 +181,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		return push(entry, NULL);
 	}
 	/**
+	*	Bottleneck synchronized with this.
+	*
 	*	@param entry An entry to be added.
 	*	@param keyword Used for development.
 	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
@@ -174,7 +190,7 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public T push(T entry, Keyword keyword)
+	public synchronized T push(T entry, Keyword keyword)
 	{
 		return add(entry, keyword);
 
@@ -252,6 +268,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		return remove(NULL);
 	}
 	/**
+	*	Bottleneck synchronized with this.
+	*
 	*	@param keyword Used for development.
 	*	@return the element that was removed.
 	*	@throws NoSuchElementException if data structure is empty.
@@ -330,6 +348,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		return pop(NULL);
 	}
 	/**
+	*	Bottleneck synchronized with this.
+	*
 	*	@param keyword Used for development.
 	*	@return the element that was popped.
 	*	@throws NoSuchElementException if data structure is empty.
@@ -409,6 +429,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		return element(NULL);
 	}
 	/**
+	*	Bottleneck synchronized with this.
+	*
 	*	@param keyword Used for development.
 	*	@return the element that is next in queue.
 	*	@throws NoSuchElementException if data structure is empty.
@@ -473,6 +495,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		return peek(NULL);
 	}
 	/**
+	*	Bottleneck synchronized with this.
+	*
 	*	@param keyword Used for development.
 	*	@return the element that is next in stack.
 	*	@throws NoSuchElementException if data structure is empty.
@@ -526,13 +550,15 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
+	*	Client method needs to ensure synchronization with this.
+	*
 	*	@param factor The multiplicative expansion coefficient.
 	*	@param keyword Used for development.
 	*	@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	private synchronized void increaseCapacity(double factor, Keyword keyword)
+	private void increaseCapacity(double factor, Keyword keyword)
 	{
 		// DEBUG
 		if(keyword == DEBUG)
@@ -574,7 +600,7 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		T[] temporaryRef = constructArray(capacity);
 		for(int j = 0; j < size; j++)
 		{
-			temporaryRef[j] = jayList[tailIndex % (originalCapacity - 1)];
+			temporaryRef[j] = jayList[tailIndex % originalCapacity];
 			tailIndex++;
 		}
 		tailIndex = 0;
@@ -591,12 +617,14 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
+	*	Client method needs to ensure synchronization with this.
+	*
 	*	@param factor The multiplicative reduction coefficient.
 	*	@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	private synchronized void decreaseCapacity(double factor, Keyword keyword)
+	private void decreaseCapacity(double factor, Keyword keyword)
 	{
 		// DEBUG
 		if(keyword == DEBUG)
@@ -699,13 +727,19 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
+	*	Client method needs to ensure synchronization with this.
+	*
 	*	@param input An array used as a template.
 	*	@return true when storage was successful, and false if otherwise.
+	*	@throws IllegalStateException when this has not been properly initialized.
+	*	@throws IllegalArgumentException when capacity cannot increase due to a predetermined maximum capacity.
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	private boolean storeArray(T[] input)
 	{
+		checkInitialization();
+
 		if(input == null)
 		{
 			return false;
@@ -721,6 +755,9 @@ public class JayList<T> implements Queue<T>, Stack<T>
 			}
 		}
 
+		if(input.length > MAX_CAPACITY)
+			throw new IllegalArgumentException();
+
 		if(input.length >= jayList.length)
 		{
 			synchronized(this.getClass())
@@ -733,29 +770,26 @@ public class JayList<T> implements Queue<T>, Stack<T>
 		}
 
 		// copy references
-		synchronized(this)
+		synchronized(this.getClass())
 		{
-			synchronized(this.getClass())
-			{
-				concurrentSize -= size;
-				size = 0;
-			}
-			for(int j = 0; j < input.length; j++)
-			{
-				if(input[j] != null)
-				{
-					jayList[j] = input[j];
-					size++;
-				}
-			}
-			synchronized(this.getClass())
-			{
-				concurrentSize += size;
-			}
-			tailIndex = 0;
-			headCursor = size;
-			return true;
+			concurrentSize -= size;
+			size = 0;
 		}
+		for(int j = 0; j < input.length; j++)
+		{
+			if(input[j] != null)
+			{
+				jayList[j] = input[j];
+				size++;
+			}
+		}
+		synchronized(this.getClass())
+		{
+			concurrentSize += size;
+		}
+		tailIndex = 0;
+		headCursor = size;
+		return true;
 	}
 
 	// /**
@@ -772,7 +806,7 @@ public class JayList<T> implements Queue<T>, Stack<T>
 
 	// 	for(int j = 0; j < capacity - 1; j++)
 	// 	{
-	// 		temporaryRef[j] = jayList[tailIndex++ % (originalCapacity - 1)];
+	// 		temporaryRef[j] = jayList[tailIndex++ % originalCapacity];
 	// 	}
 	// 	tailIndex = 0;
 	// 	headCursor = size;
@@ -831,6 +865,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
+	*	Client method needs to ensure synchronization with this.
+	*
 	*	@param capacity The capacity of the array to be constructed.
 	*	@return Initialized array of T types with the accepted value as its capacity.
 	*	@throws IllegalArgumentException when the size of the accepted value exceeds a predetermined maximum capacity.
@@ -854,6 +890,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
+	*	Client method needs to ensure synchronization with this.
+	*
 	*	@throws IllegalStateException when this has not been properly initialized.
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
@@ -867,11 +905,13 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
+	*	Client method needs to ensure synchronization with this.
+	*
 	*	@return true if no elements exist in this data structure.
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized boolean isEmpty()
+	public boolean isEmpty()
 	{
 		if(headCursor == tailIndex)
 			return true;
@@ -879,6 +919,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 	}
 
 	/**
+	*	Client method needs to ensure synchronization with this.
+	*
 	*	@return true if data represented is in full state.
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
@@ -933,8 +975,8 @@ public class JayList<T> implements Queue<T>, Stack<T>
 			print(1, "concurrentObjects :\t" + concurrentObjects);
 			print(1, "concurrentCapacity :\t" + concurrentCapacity);
 			print(1, "concurrentSize : \t" + concurrentSize);
-			print(1, "size :\t\t\t" + size);
-			print(1, "capacity :\t\t" + capacity);
+			print(1, "size :\t\t\t" + size + " <---");
+			print(1, "capacity :\t\t" + capacity + " <---");
 			print(1, "initialized :\t\t" + initialized);
 			print(1, "headCursor :\t\t" + headCursor);
 			print(1, "tailIndex :\t\t" + tailIndex);

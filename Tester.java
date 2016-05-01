@@ -41,14 +41,48 @@ public class Tester
 
 		for(int j = 0; j < size; j++)
 		{
-			System.out.println(list.push(alist[j]));//, DEBUG);
+			System.out.print(list.add(alist[j]) + " ");//, DEBUG);
 		}
+		System.out.println();
 		list.showState(DEBUG);
 
 		for(int j = 0; j < size; j++)
 		{
-			System.out.println(list.pop());
+			System.out.print(list.remove() + " ");
 		}
+		System.out.println();
+		list.showState(DEBUG);
+
+		System.out.println("\n1)----------------------------------------------------------");
+
+		for(int j = 0; j < size; j++)
+		{
+			System.out.print(list.add(alist[j]) + " ");//, DEBUG);
+		}
+		System.out.println();
+		list.showState(DEBUG);
+
+		for(int j = 0; j < size - 10; j++)
+		{
+			System.out.print(list.remove() + " ");
+		}
+		System.out.println();
+		list.showState(IDDEBUG);
+
+		System.out.println("\n2)----------------------------------------------------------");
+
+		for(int j = 0; j < size; j++)
+		{
+			System.out.print(list.add(alist[j]) + " ");//, DEBUG);
+		}
+		System.out.println();
+		list.showState(IDDEBUG);
+
+		for(int j = 0; j < size; j++)
+		{
+			System.out.print(list.pop() + " ");
+		}
+		System.out.println();
 		list.showState(DEBUG);
 
 		// // list.remove();
