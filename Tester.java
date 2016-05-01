@@ -7,7 +7,7 @@ public class Tester
 	public static void main(String[] args)
 	{
 		JaeList<Object> list = new JaeList<Object>();
-		final int size = 10000000;
+		final int size = 10;//1031;
 
 		Object[] a1 = new Integer[size];
 		Object[] a2 = new Double[size];
@@ -39,22 +39,43 @@ public class Tester
 			}
 		}
 
-		for(int j = 0; j < size; j++)
+		for(int j = 0; j < 10; j++)
 		{
 			list.add(alist[j]);//, DEBUG);
 		}
 		list.showState(DEBUG);
 
-		for(int j = 0; j < size; j++)
+		for(int j = 0; j < 9; j++)
 		{
 			list.remove();//DEBUG);
 		}
 		list.showState(DEBUG);
 
-		for(int j = 0; j < size; j++)
+		for(int j = 0; j < 2; j++)
 		{
-			list.add(alist[j]);//, DEBUG);
+			list.add(alist[j]);
 		}
+		list.showState(IDDEBUG);
+
+		for(int j = 0; j < 1; j++)
+		{
+			list.remove();
+		}
+		list.showState(IDDEBUG);
+
+		Object[] a4 = list.toArray();
+		System.out.print("\nTOARRAY: [");
+		for(int j = 0; j < a4.length; j++)
+		{
+			if(j == a4.length - 1)
+			{
+				System.out.print(a4[j]);
+				break;
+			}
+			System.out.print(a4[j] + ", ");
+		}
+		System.out.println("]");
+		System.out.println("ARRAY SIZE : " + a4.length + "\n");
 		list.showState(DEBUG);
 	}
 }

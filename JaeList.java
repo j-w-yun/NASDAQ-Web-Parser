@@ -21,10 +21,10 @@ public class JaeList<T>
 
 	// class settings.
 	private final int MAX_CAPACITY = 1000000000;
-	private final int DEFAULT_CAPACITY = 2;
+	private final int DEFAULT_CAPACITY = 2;	//e.g. 1024
 	private final double EXPANSION_FACTOR = 2.0;
 	private final double REDUCTION_FACTOR = 2.0;
-	private final int REDUCTION_REQUIREMENT = 1025;
+	private final int REDUCTION_REQUIREMENT = 2;	//e.g. 1025
 
 	// class states.
 	private static volatile int concurrentObjects = 0;
@@ -362,7 +362,7 @@ public class JaeList<T>
 		T[] temporaryRef = constructArray(capacity);
 		for(int j = 0; j < capacity - 1; j++)
 		{
-			temporaryRef[j] = jaeList[tailIndex++ % (originalCapacity - 1)];
+			temporaryRef[j] = jaeList[tailIndex++ % originalCapacity];
 		}
 		tailIndex = 0;
 		headCursor = size;
@@ -477,16 +477,26 @@ public class JaeList<T>
 		}
 	}
 
-	/**
-	*	Sets capacity to a minimal value and tailIndex is shifted to array index of zero.
-	*
-	*	@since 1.0.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
-	*/
-	private synchronized void normalize()
-	{
+	// /**
+	// *	Sets capacity to a minimal value and tailIndex is shifted to array index of zero.
+	// *
+	// *	@since 1.0.0
+	// *	@author Jaewan Yun (Jay50@pitt.edu)
+	// */
+	// private synchronized void normalize()
+	// {
+	// 	int originalCapacity = capacity;
+	// 	capacity = size + 1;
+	// 	T[] temporaryRef = constructArray(capacity);
 
-	}
+	// 	for(int j = 0; j < capacity - 1; j++)
+	// 	{
+	// 		temporaryRef[j] = jaeList[tailIndex++ % (originalCapacity - 1)];
+	// 	}
+	// 	tailIndex = 0;
+	// 	headCursor = size;
+	// 	jaeList = temporaryRef;
+	// }
 
 	/**
 	*	@return A copy of this array.
@@ -495,11 +505,16 @@ public class JaeList<T>
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized T[] toArray()
+	@SuppressWarnings("unchecked") public synchronized T[] toArray()
 	{
 		checkInitialization();
-		normalize();
-		return copyOf(jaeList);
+		int newTailIndex = tailIndex;
+		T[] toReturn = (T[]) new Object[size];
+		for(int j = 0; j < size; j++)
+		{
+			toReturn[j] = jaeList[newTailIndex++ % capacity];
+		}
+		return toReturn;
 	}
 
 	/**
