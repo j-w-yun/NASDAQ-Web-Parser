@@ -1,30 +1,27 @@
-import constant.*;
-import static constant.Keyword.*;
-
-
-
 /**
-*	A circular implementation of an array-based abstract data structure with capabilities of
-*	first-in-first-out to be used in the analysis of trade data. Project requires a thread-safe
-*	queue.
+*	A thread-safe circular implementation of an array-based abstract data structure with capabilities of first-in-first-out and
+*	first-in-last-out.
 *
 *	@author Jaewan Yun (Jay50@pitt.edu)
 *	@version 1.0.0
 */
 
+import java.util.*;
+import constant.*;
+import static constant.Keyword.*;
 
-
-public class JaeList<T>
+public class JayList<T> implements Queue<T>, Stack<T>
 {
 	// underlying data structure.
-	private volatile T[] jaeList = null;
+	private volatile T[] jayList = null;
 
 	// class settings.
-	private final int MAX_CAPACITY = 1000000000;
 	private final int DEFAULT_CAPACITY = 2;	//e.g. 1024
 	private final double EXPANSION_FACTOR = 2.0;
 	private final double REDUCTION_FACTOR = 2.0;
-	private final int REDUCTION_REQUIREMENT = 2;	//e.g. 1025
+	private final int REDUCTION_REQUIREMENT_SIZE = 2;	//e.g. 1025
+	private final int REDUCTION_REQUIREMENT_FACTOR = 4;	//e.g. 4
+	private final int MAX_CAPACITY = (2147483647 / (int) EXPANSION_FACTOR);
 
 	// class states.
 	private static volatile int concurrentObjects = 0;
@@ -45,9 +42,9 @@ public class JaeList<T>
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public JaeList()
+	public JayList()
 	{
-		jaeList = constructArray(DEFAULT_CAPACITY);
+		jayList = constructArray(DEFAULT_CAPACITY);
 		capacity = DEFAULT_CAPACITY;
 		initialized = true;
 		synchronized(this.getClass())
@@ -64,9 +61,9 @@ public class JaeList<T>
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public JaeList(int capacity)
+	public JayList(int capacity)
 	{
-		jaeList = constructArray(capacity);
+		jayList = constructArray(capacity);
 		this.capacity = capacity;
 		initialized = true;
 		synchronized(this.getClass())
@@ -82,7 +79,7 @@ public class JaeList<T>
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public JaeList(T[] input)
+	public JayList(T[] input)
 	{
 		storeArray(input);
 		initialized = true;
@@ -94,25 +91,27 @@ public class JaeList<T>
 
 	/**
 	*	@param entry An entry to be added.
-	*	@throws IllegalStateException when this has not been properly initialized.
-	*	@throws IllegalArgumentException when entry cannot be added due to a predetermined maximum capacity.
+	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public void add(T entry)
+	public T add(T entry)
 	{
-		add(entry, NULL);
+		return add(entry, NULL);
 	}
 	/**
 	*	@param entry An entry to be added.
 	*	@param keyword Used for development.
-	*	@throws IllegalStateException when this has not been properly initialized.
-	*	@throws IllegalArgumentException when entry cannot be added due to a predetermined maximum capacity.
+	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
+	*	@throws IllegalArgumentException when entry is null.
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized void add(T entry, Keyword keyword)
+	public synchronized T add(T entry, Keyword keyword)
 	{
+		if(entry == null)
+			throw new IllegalArgumentException();
+
 		// DEBUG
 		if(keyword == IDDEBUG)
 		{
@@ -132,7 +131,7 @@ public class JaeList<T>
 		checkInitialization();
 		if(isFull())
 			increaseCapacity(EXPANSION_FACTOR, keyword);
-		jaeList[headCursor] = entry;
+		jayList[headCursor] = entry;
 		headCursor = (headCursor + 1) % capacity;
 		size++;
 		synchronized(this.getClass())
@@ -153,7 +152,79 @@ public class JaeList<T>
 			print(1, "After ADD : SIZE : " + size + " ADDED " + entry + "(" + entry.getClass().toString() + ")");
 		}
 		// END DEBUG
+
+		return jayList[(headCursor - 1) % capacity];
 	}
+
+	/**
+	*	@param entry An entry to be added.
+	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public T push(T entry)
+	{
+		return push(entry, NULL);
+	}
+	/**
+	*	@param entry An entry to be added.
+	*	@param keyword Used for development.
+	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
+	*	@throws IllegalArgumentException when entry is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public T push(T entry, Keyword keyword)
+	{
+		return add(entry, keyword);
+
+		// if(entry == null)
+		// 	throw new IllegalArgumentException();
+
+		// // DEBUG
+		// if(keyword == IDDEBUG)
+		// {
+		// 	print(1, "\n\nIDDEBUG ENABLED");
+		// 	print(1, "Prior to PUSH : CAPACITY : " + capacity);
+		// 	print(1, "Prior to PUSH : HEADCURSOR : " + headCursor);
+		// 	print(1, "Prior to PUSH : TAILINDEX : " + tailIndex);
+		// }
+		// if(keyword == DEBUG || keyword == IDDEBUG)
+		// {
+		// 	print(1, "Prior to PUSH : SIZE : " + size + " PUSHING " + entry + "(" + entry.getClass().toString() + ")");
+		// }
+		// // END DEBUG
+
+
+		// // add the entry to the headCursor position and increment headCursor using modulo.
+		// checkInitialization();
+		// if(isFull())
+		// 	increaseCapacity(EXPANSION_FACTOR, keyword);
+		// jayList[(tailIndex - 1) % capacity] = entry;
+		// tailIndex = (tailIndex - 1) % capacity;
+		// size++;
+		// synchronized(this.getClass())
+		// {
+		// 	concurrentSize++;
+		// }
+
+
+		// // DEBUG
+		// if(keyword == IDDEBUG)
+		// {
+		// 	print(1, "After PUSH : CAPACITY : " + capacity);
+		// 	print(1, "After PUSH : HEADCURSOR : " + headCursor);
+		// 	print(1, "After PUSH : TAILINDEX : " + tailIndex);
+		// }
+		// if(keyword == DEBUG || keyword == IDDEBUG)
+		// {
+		// 	print(1, "After PUSH : SIZE : " + size + " PUSHED " + entry + "(" + entry.getClass().toString() + ")");
+		// }
+		// // END DEBUG
+
+		// return jayList[tailIndex];
+	}
+
 
 	// /**
 	// *	@param entry An entry to be added.
@@ -183,7 +254,8 @@ public class JaeList<T>
 	/**
 	*	@param keyword Used for development.
 	*	@return the element that was removed.
-	*	@throws IllegalArgumentException if data structure is empty.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if removed value is null.
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
@@ -191,7 +263,7 @@ public class JaeList<T>
 	{
 		// check that data structure is non-empty
 		if(isEmpty())
-			throw new IllegalArgumentException();
+			throw new NoSuchElementException();
 
 
 		// DEBUG
@@ -204,14 +276,14 @@ public class JaeList<T>
 		}
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "Prior to REMOVE : SIZE : " + size + " REMOVING " + jaeList[tailIndex] + "(" + jaeList[tailIndex].getClass().toString() + ")");
+			print(1, "Prior to REMOVE : SIZE : " + size + " REMOVING " + jayList[tailIndex] + "(" + jayList[tailIndex].getClass().toString() + ")");
 		}
 		// END DEBUG
 
 
 		// remove an item from the tailIndex and increment tailIndex using modulo.
-		T toReturn = jaeList[tailIndex];
-		jaeList[tailIndex] = null;
+		T toReturn = jayList[tailIndex];
+		jayList[tailIndex] = null;
 		tailIndex = ++tailIndex % capacity;
 		size--;
 		synchronized(this.getClass())
@@ -229,7 +301,7 @@ public class JaeList<T>
 
 
 		// reduce capacity.
-		if((size < (capacity / 4)) && (capacity > REDUCTION_REQUIREMENT))
+		if((size < (capacity / REDUCTION_REQUIREMENT_FACTOR)) && (capacity > REDUCTION_REQUIREMENT_SIZE))
 			decreaseCapacity(REDUCTION_FACTOR, keyword);
 
 
@@ -242,7 +314,214 @@ public class JaeList<T>
 		}
 		// // END DEBUG
 
+		if(toReturn == null)
+			throw new NullPointerException();
+		return toReturn;
+	}
 
+	/**
+	*	@return the element that was popped.
+	*	@throws IllegalArgumentException if data structure is empty.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public T pop()
+	{
+		return pop(NULL);
+	}
+	/**
+	*	@param keyword Used for development.
+	*	@return the element that was popped.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if popped value is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public synchronized T pop(Keyword keyword)
+	{
+		// check that data structure is non-empty
+		if(isEmpty())
+			throw new NoSuchElementException();
+
+
+		// DEBUG
+		if(keyword == IDDEBUG)
+		{
+			print(1, "\n\nIDDEBUG ENABLED");
+			print(1, "Prior to POP : CAPACITY : " + capacity);
+			print(1, "Prior to POP : HEADCURSOR : " + headCursor);
+			print(1, "Prior to POP : TAILINDEX : " + tailIndex);
+		}
+		if(keyword == DEBUG || keyword == IDDEBUG)
+		{
+			print(1, "Prior to POP : SIZE : " + size + " POPPING " + jayList[tailIndex] + "(" + jayList[tailIndex].getClass().toString() + ")");
+		}
+		// END DEBUG
+
+
+		// remove an item from the tailIndex and increment tailIndex using modulo.
+		T toReturn = jayList[(headCursor - 1) % capacity];
+		jayList[(headCursor - 1) % capacity] = null;
+		headCursor = (headCursor - 1) % capacity;
+		size--;
+		synchronized(this.getClass())
+		{
+			concurrentSize--;
+		}
+
+
+		// DEBUG
+		if(keyword == DEBUG || keyword == IDDEBUG)
+		{
+			print(1, "After POP : SIZE : " + size + " POPPED " + toReturn + "(" + toReturn.getClass().toString() + ")");
+		}
+		// END DEBUG
+
+
+		// reduce capacity.
+		if((size < (capacity / REDUCTION_REQUIREMENT_FACTOR)) && (capacity > REDUCTION_REQUIREMENT_SIZE))
+			decreaseCapacity(REDUCTION_FACTOR, keyword);
+
+
+		// // DEBUG
+		if(keyword == IDDEBUG)
+		{
+			print(1, "After POP : CAPACITY : " + capacity);
+			print(1, "After POP : HEADCURSOR : " + headCursor);
+			print(1, "After POP : TAILINDEX : " + tailIndex);
+		}
+		// // END DEBUG
+
+		if(toReturn == null)
+			throw new NullPointerException();
+		return toReturn;
+	}
+
+	/**
+	*	@return the element that is next in queue.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if next value is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public T element()
+	{
+		return element(NULL);
+	}
+	/**
+	*	@param keyword Used for development.
+	*	@return the element that is next in queue.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if next value is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public synchronized T element(Keyword keyword)
+	{
+		// check that data structure is non-empty
+		if(isEmpty())
+			throw new NoSuchElementException();
+
+
+		// DEBUG
+		if(keyword == IDDEBUG)
+		{
+			print(1, "\n\nIDDEBUG ENABLED");
+			print(1, "Prior to ELEMENT : CAPACITY : " + capacity);
+			print(1, "Prior to ELEMENT : HEADCURSOR : " + headCursor);
+			print(1, "Prior to ELEMENT : TAILINDEX : " + tailIndex);
+		}
+		if(keyword == DEBUG || keyword == IDDEBUG)
+		{
+			print(1, "Prior to ELEMENT : SIZE : " + size + " ELEMENTING " + jayList[tailIndex] + "(" + jayList[tailIndex].getClass().toString() + ")");
+		}
+		// END DEBUG
+
+
+		// get next.
+		T toReturn = jayList[tailIndex];
+
+
+		// DEBUG
+		if(keyword == DEBUG || keyword == IDDEBUG)
+		{
+			print(1, "After ELEMENT : SIZE : " + size + " ELEMENTED " + toReturn + "(" + toReturn.getClass().toString() + ")");
+		}
+		if(keyword == IDDEBUG)
+		{
+			print(1, "After ELEMENT : CAPACITY : " + capacity);
+			print(1, "After ELEMENT : HEADCURSOR : " + headCursor);
+			print(1, "After ELEMENT : TAILINDEX : " + tailIndex);
+		}
+		// // END DEBUG
+
+
+		if(toReturn == null)
+			throw new NullPointerException();
+		return toReturn;
+	}
+
+	/**
+	*	@return the element that is next in stack.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if next value is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public T peek()
+	{
+		return peek(NULL);
+	}
+	/**
+	*	@param keyword Used for development.
+	*	@return the element that is next in stack.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if next value is null.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public synchronized T peek(Keyword keyword)
+	{
+		// check that data structure is non-empty
+		if(isEmpty())
+			throw new NoSuchElementException();
+
+
+		// DEBUG
+		if(keyword == IDDEBUG)
+		{
+			print(1, "\n\nIDDEBUG ENABLED");
+			print(1, "Prior to PEEK : CAPACITY : " + capacity);
+			print(1, "Prior to PEEK : HEADCURSOR : " + headCursor);
+			print(1, "Prior to PEEK : TAILINDEX : " + tailIndex);
+		}
+		if(keyword == DEBUG || keyword == IDDEBUG)
+		{
+			print(1, "Prior to PEEK : SIZE : " + size + " PEEKING " + jayList[tailIndex] + "(" + jayList[tailIndex].getClass().toString() + ")");
+		}
+		// END DEBUG
+
+
+		// get next.
+		T toReturn = jayList[(headCursor - 1) % capacity];
+
+
+		// DEBUG
+		if(keyword == DEBUG || keyword == IDDEBUG)
+		{
+			print(1, "After PEEK : SIZE : " + size + " PEEKED " + toReturn + "(" + toReturn.getClass().toString() + ")");
+		}
+		if(keyword == IDDEBUG)
+		{
+			print(1, "After PEEK : CAPACITY : " + capacity);
+			print(1, "After PEEK : HEADCURSOR : " + headCursor);
+			print(1, "After PEEK : TAILINDEX : " + tailIndex);
+		}
+		// // END DEBUG
+
+
+		if(toReturn == null)
+			throw new NullPointerException();
 		return toReturn;
 	}
 
@@ -261,12 +540,12 @@ public class JaeList<T>
 			print(1, "\nSIZE : " + size + " out of " + capacity);
 			print(1, "INCREASING CAPACITY...");
 			int count = 0;
-			for(int j = 0; j < jaeList.length; j++)
+			for(int j = 0; j < jayList.length; j++)
 			{
 				print(0, "\tPOS " + j + " > ");
-				if(jaeList[j] != null)
+				if(jayList[j] != null)
 				{
-					print(1, jaeList[j] + "(" + jaeList[j].getClass().toString() + ")");
+					print(1, jayList[j] + "(" + jayList[j].getClass().toString() + ")");
 					count++;
 				}
 				else
@@ -280,6 +559,8 @@ public class JaeList<T>
 
 
 		// increase capacity.
+		if((int) (capacity * EXPANSION_FACTOR + 1) > MAX_CAPACITY)
+			throw new IllegalStateException();
 		synchronized(this.getClass())
 		{
 			concurrentCapacity -= capacity;
@@ -293,12 +574,12 @@ public class JaeList<T>
 		T[] temporaryRef = constructArray(capacity);
 		for(int j = 0; j < size; j++)
 		{
-			temporaryRef[j] = jaeList[tailIndex % (originalCapacity - 1)];
+			temporaryRef[j] = jayList[tailIndex % (originalCapacity - 1)];
 			tailIndex++;
 		}
 		tailIndex = 0;
 		headCursor = size;
-		jaeList = temporaryRef;
+		jayList = temporaryRef;
 
 
 		// DEBUG
@@ -326,12 +607,12 @@ public class JaeList<T>
 			}
 			print(1, "\nSIZE : " + size + " out of " + capacity);
 			int count = 0;
-			for(int j = 0; j < jaeList.length; j++)
+			for(int j = 0; j < jayList.length; j++)
 			{
 				print(0, "\tPOS " + j + " > ");
-				if(jaeList[j] != null)
+				if(jayList[j] != null)
 				{
-					print(1, jaeList[j] + "(" + jaeList[j].getClass().toString() + ")");
+					print(1, jayList[j] + "(" + jayList[j].getClass().toString() + ")");
 					count++;
 				}
 				else
@@ -362,11 +643,11 @@ public class JaeList<T>
 		T[] temporaryRef = constructArray(capacity);
 		for(int j = 0; j < capacity - 1; j++)
 		{
-			temporaryRef[j] = jaeList[tailIndex++ % originalCapacity];
+			temporaryRef[j] = jayList[tailIndex++ % originalCapacity];
 		}
 		tailIndex = 0;
 		headCursor = size;
-		jaeList = temporaryRef;
+		jayList = temporaryRef;
 
 
 		// DEBUG
@@ -375,12 +656,12 @@ public class JaeList<T>
 			print(1, "\nSIZE : " + size + " out of " + capacity);
 			print(1, "DECREASING CAPACITY...");
 			int count = 0;
-			for(int j = 0; j < jaeList.length; j++)
+			for(int j = 0; j < jayList.length; j++)
 			{
 				print(0, "\tPOS " + j + " > ");
-				if(jaeList[j] != null)
+				if(jayList[j] != null)
 				{
-					print(1, jaeList[j] + "(" + jaeList[j].getClass().toString() + ")");
+					print(1, jayList[j] + "(" + jayList[j].getClass().toString() + ")");
 					count++;
 				}
 				else
@@ -400,8 +681,8 @@ public class JaeList<T>
 	*/
 	public synchronized void clear()
 	{
-		jaeList = null;
-		jaeList = constructArray(DEFAULT_CAPACITY);
+		jayList = null;
+		jayList = constructArray(DEFAULT_CAPACITY);
 		synchronized(this.getClass())
 		{
 			concurrentCapacity -= (capacity - DEFAULT_CAPACITY);
@@ -430,23 +711,23 @@ public class JaeList<T>
 			return false;
 		}
 
-		if(jaeList == null)
+		if(jayList == null)
 		{
 			synchronized(this.getClass())
 			{
-				jaeList = constructArray(input.length);
+				jayList = constructArray(input.length);
 				capacity = input.length;
 				concurrentCapacity += input.length;
 			}
 		}
 
-		if(input.length >= jaeList.length)
+		if(input.length >= jayList.length)
 		{
 			synchronized(this.getClass())
 			{
-				jaeList = constructArray(input.length);
+				jayList = constructArray(input.length);
 				capacity = input.length;
-				concurrentCapacity -= jaeList.length;
+				concurrentCapacity -= jayList.length;
 				concurrentCapacity += input.length;
 			}
 		}
@@ -463,7 +744,7 @@ public class JaeList<T>
 			{
 				if(input[j] != null)
 				{
-					jaeList[j] = input[j];
+					jayList[j] = input[j];
 					size++;
 				}
 			}
@@ -491,17 +772,17 @@ public class JaeList<T>
 
 	// 	for(int j = 0; j < capacity - 1; j++)
 	// 	{
-	// 		temporaryRef[j] = jaeList[tailIndex++ % (originalCapacity - 1)];
+	// 		temporaryRef[j] = jayList[tailIndex++ % (originalCapacity - 1)];
 	// 	}
 	// 	tailIndex = 0;
 	// 	headCursor = size;
-	// 	jaeList = temporaryRef;
+	// 	jayList = temporaryRef;
 	// }
 
 	/**
 	*	@return A copy of this array.
 	*	@throws IllegalStateException when this has not been properly initialized.
-	*	@throws NullPointerException when jaeList is null.
+	*	@throws NullPointerException when jayList is null.
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
@@ -512,7 +793,7 @@ public class JaeList<T>
 		T[] toReturn = (T[]) new Object[size];
 		for(int j = 0; j < size; j++)
 		{
-			toReturn[j] = jaeList[newTailIndex++ % capacity];
+			toReturn[j] = jayList[newTailIndex++ % capacity];
 		}
 		return toReturn;
 	}
@@ -590,7 +871,7 @@ public class JaeList<T>
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public boolean isEmpty()
+	public synchronized boolean isEmpty()
 	{
 		if(headCursor == tailIndex)
 			return true;
@@ -615,10 +896,14 @@ public class JaeList<T>
 	*/
 	protected void finalize()
 	{
-		synchronized(this.getClass())
+		synchronized(this)
 		{
-			concurrentObjects--;
-			concurrentCapacity -= capacity;
+			initialized = false;
+			synchronized(this.getClass())
+			{
+				concurrentObjects--;
+				concurrentCapacity -= capacity;
+			}
 		}
 	}
 
@@ -628,7 +913,7 @@ public class JaeList<T>
 	*/
 	public synchronized String toString()
 	{
-		return jaeList.toString();
+		return jayList.toString();
 	}
 
 	/**
@@ -640,7 +925,7 @@ public class JaeList<T>
 	{
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "jaeList Address :\t" + jaeList);
+			print(1, "jayList Address :\t" + jayList);
 			print(1, "MAX_CAPACITY :\t\t" + MAX_CAPACITY);
 			print(1, "DEFAULT_CAPACITY :\t" + DEFAULT_CAPACITY);
 			print(1, "EXPANSION_FACTOR :\t" + EXPANSION_FACTOR);
@@ -653,35 +938,35 @@ public class JaeList<T>
 			print(1, "initialized :\t\t" + initialized);
 			print(1, "headCursor :\t\t" + headCursor);
 			print(1, "tailIndex :\t\t" + tailIndex);
-			print(1, "\n\tEND OF JaeList EXPLICIT STATE\n");
+			print(1, "\n\tEND OF JayList EXPLICIT STATE\n");
 		}
 
 		if(keyword == IDDEBUG)
 		{
-			if(jaeList != null)
+			if(jayList != null)
 			{
-				print(1, "length :\t\t" + jaeList.length);
-				if(jaeList[tailIndex] != null)
-					print(1, "tailIndex type :\t" + jaeList[tailIndex].getClass().toString());
+				print(1, "length :\t\t" + jayList.length);
+				if(jayList[tailIndex] != null)
+					print(1, "tailIndex type :\t" + jayList[tailIndex].getClass().toString());
 				else
 					print(1, "tailIndex type :\tnull");
-				if(jaeList[headCursor] != null)
-					print(1, "headCursor type :\t" + jaeList[tailIndex].getClass().toString());
+				if(jayList[headCursor] != null)
+					print(1, "headCursor type :\t" + jayList[tailIndex].getClass().toString());
 				else
 					print(1, "headCursor type :\tnull");
 				if(headCursor - 1 < 0)
-					if(jaeList[capacity - 1] != null)
-						print(1, "headIndex type :\t" + jaeList[tailIndex].getClass().toString());
+					if(jayList[capacity - 1] != null)
+						print(1, "headIndex type :\t" + jayList[tailIndex].getClass().toString());
 				if(headCursor - 1 >= 0)
-					if(jaeList[headCursor - 1] != null)
-						print(1, "headIndex type :\t" + jaeList[tailIndex].getClass().toString());
+					if(jayList[headCursor - 1] != null)
+						print(1, "headIndex type :\t" + jayList[tailIndex].getClass().toString());
 				print(1, "\n\tEND OF T[] EXPLICIT STATE\n");
 
-				for(int j = 0; j < jaeList.length; j++)
+				for(int j = 0; j < jayList.length; j++)
 				{
-					print(0, "Index  " + j + ": \t[" + jaeList[j]);
-					if(jaeList[j] != null)
-						print(1, "\t] of type (" + jaeList[j].getClass().toString() + ")");
+					print(0, "Index  " + j + ": \t[" + jayList[j]);
+					if(jayList[j] != null)
+						print(1, "\t] of type (" + jayList[j].getClass().toString() + ")");
 					else
 						print(0, "\t]\n");
 				}
@@ -689,7 +974,7 @@ public class JaeList<T>
 			}
 			else
 			{
-				print(2, "jaeList is null therefore unaccessible");
+				print(2, "jayList is null therefore unaccessible");
 			}
 		}
 	}

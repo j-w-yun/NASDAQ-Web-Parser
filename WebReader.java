@@ -14,6 +14,7 @@ public class WebReader
 {
 	public static void main(String[] args)
 	{
+		JaeList<String> jaeList = new JaeList<String>();
 		String a = "www.nasdaq.com/markets/indices/sector-indices.aspx";
 		// String a = "www.nasdaq.com/markets/indices/major-indices.aspx";
 
@@ -27,7 +28,7 @@ public class WebReader
 
 		try
 		{
-			URL url = new URL("http://" + args[0] + "/");
+			URL url = new URL("http://" + a + "/");
 			URLConnection con = url.openConnection();
 			InputStream in = con.getInputStream();
 			String encoding = con.getContentEncoding();
@@ -55,7 +56,7 @@ public class WebReader
 
 					if(read == true && counter < 8)
 					{
-						System.out.println(temp2);
+						jaeList.add(temp2);
 					}
 
 					counter++;
@@ -70,6 +71,18 @@ public class WebReader
 		catch(Exception e)
 		{
 			e.printStackTrace();
+		}
+
+		try
+		{
+			while(true)
+			{
+				System.out.println(jaeList.remove());
+			}
+		}
+		catch(Exception e)
+		{
+
 		}
 	}
 }
