@@ -18,10 +18,7 @@ public class Tester
 
 		for(int j = 0; j < size; j++)
 		{
-			counter %= 3;
-			counter++;
-
-			a1[j] = new Double(j*9);
+			a1[j] = new Double(j * 9);
 			a2[j] = new Double(j * 9 * 9);
 			a3[j] = new Double(j * 9 * 9 * 9);
 
@@ -94,7 +91,7 @@ public class Tester
 			System.out.print(list.addLast(alist[j]) + " ");//, DEBUG);
 		}
 		System.out.println("\n\n\t\t\tADD LAST");
-		list.showState(DEBUG);
+		list.showState(IDDEBUG);
 
 		// for(int j = 0; j < size + 50; j++)
 		// {
