@@ -272,6 +272,12 @@ public class JayList<T> implements MyDeque<T>
 		if(entry == null || position < 0 || position > size)
 			throw new IllegalArgumentException();
 
+		if(size < 3)
+		{
+			increaseCapacity(EXPANSION_FACTOR, keyword, -1);
+		}
+
+
 		// DEBUG
 		if(keyword == IDDEBUG)
 		{
@@ -290,19 +296,31 @@ public class JayList<T> implements MyDeque<T>
 		if(isFull())
 		{
 			increaseCapacity(EXPANSION_FACTOR, keyword, position);
-			jayList[position] = entry;
+			jayList[size - position] = entry;
+			size++;
+			synchronized(this.getClass())
+			{
+				concurrentSize++;
+			}
+		}
+		else if(size == 0 || position == size)
+		{
+			addLast(entry);
+		}
+		else if(position == 0)
+		{
+			addFirst(entry);
 		}
 		else
 		{
-			// shift first or last positions into last or first positions until position is met, respectively, and insert at the open position.
-			if(position < (size / 2))
+			int addIndex = ((tailIndex + capacity - 1) - position) % capacity;
+			if(addIndex < size / 2)
 			{
 				for(int j = 0; j < position; j++)
 				{
 					addLast(removeFirst());
 				}
 				addFirst(entry);
-				// TODO
 				for(int j = 0; j < position; j++)
 				{
 					addFirst(removeLast());
@@ -310,13 +328,12 @@ public class JayList<T> implements MyDeque<T>
 			}
 			else
 			{
-				for(int j = 0; j < position; j++)
+				for(int j = 0; j < size - position; j++)
 				{
 					addFirst(removeLast());
 				}
 				addLast(entry);
-				// TODO
-				for(int j = 0; j < position; j++)
+				for(int j = 0; j < size - 1 - position; j++)
 				{
 					addLast(removeFirst());
 				}
@@ -333,13 +350,12 @@ public class JayList<T> implements MyDeque<T>
 		}
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "After ADD POSITION : SIZE : " + size + " ADDED " + get(position) + "(" + get(position).getClass().toString() + ")");
+			// print(1, "After ADD POSITION : SIZE : " + size + " ADDED " + get(addIndex) + "(" + get(addIndex).getClass().toString() + ")");
 		}
 		// END DEBUG
 
 		// TODO
-		return null;
-		// return get(position);
+		return get(position);
 	}
 
 	/**
@@ -830,7 +846,7 @@ public class JayList<T> implements MyDeque<T>
 	private void increaseCapacity(double factor, Keyword keyword, int position)
 	{
 		// DEBUG
-		if(keyword == DEBUG)
+		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
 			print(1, "\nSIZE : " + size + " out of " + capacity);
 			print(1, "INCREASING CAPACITY...");
@@ -867,8 +883,7 @@ public class JayList<T> implements MyDeque<T>
 			concurrentCapacity += capacity;
 		}
 		T[] temporaryRef = constructArray(capacity);
-
-		if(position == -1 || position == (size - 1))
+		if(position == -1)// || position == (size - 1))
 		{
 			for(int j = 0; j < size; j++)
 			{
@@ -881,11 +896,15 @@ public class JayList<T> implements MyDeque<T>
 		}
 		else
 		{
+			position = size - position;
 			for(int j = 0; j <= size; j++)
 			{
 				if(j == position)
 				{
-					tailIndex--;
+					if(tailIndex == 0)
+						tailIndex = capacity - 1;
+					else
+						tailIndex--;
 				}
 				temporaryRef[j] = jayList[tailIndex % originalCapacity];
 				tailIndex++;
@@ -896,9 +915,24 @@ public class JayList<T> implements MyDeque<T>
 		}
 
 		// DEBUG
-		if(keyword == DEBUG)
+		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
 			print(1, "CAPACITY INCREASED TO : " + capacity + "\n");
+			int count = 0;
+			for(int j = 0; j < jayList.length; j++)
+			{
+				print(0, "\tPOS " + j + " > ");
+				if(jayList[j] != null)
+				{
+					print(1, jayList[j] + "(" + jayList[j].getClass().toString() + ")");
+					count++;
+				}
+				else
+				{
+					print(1, "null");
+				}
+			}
+			print(2, "objectCounter : " + count);
 		}
 		// END DEBUG
 	}
@@ -914,7 +948,7 @@ public class JayList<T> implements MyDeque<T>
 	private void decreaseCapacity(double factor, Keyword keyword)
 	{
 		// DEBUG
-		if(keyword == DEBUG)
+		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
 			for(int j = 0; j < 10; j++)
 			{
@@ -966,7 +1000,7 @@ public class JayList<T> implements MyDeque<T>
 
 
 		// DEBUG
-		if(keyword == DEBUG)
+		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
 			print(1, "\nSIZE : " + size + " out of " + capacity);
 			print(1, "DECREASING CAPACITY...");
@@ -985,7 +1019,7 @@ public class JayList<T> implements MyDeque<T>
 				}
 			}
 			print(1, "objectCounter : " + count);
-			print(1, "CAPACITY DECREASED TO : " + capacity + "\n");
+			print(2, "CAPACITY DECREASED TO : " + capacity + "\n");
 		}
 		// END DEBUG
 	}

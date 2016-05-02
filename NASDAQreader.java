@@ -92,6 +92,7 @@ public class NASDAQreader implements Runnable
 					lineCounter++;
 				}
 			}
+			// System.out.println(body);
 		}
 		catch(Exception e) {e.printStackTrace();}
 
