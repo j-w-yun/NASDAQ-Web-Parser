@@ -55,10 +55,11 @@ public class NASDAQreader implements Runnable
 		parser = new Parser();
 	}
 
-	@SuppressWarnings("unchecked") public void run()
+	public void run()
 	{
 		read();
 	}
+
 	private void read()
 	{
 		try

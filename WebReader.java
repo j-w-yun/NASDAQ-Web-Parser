@@ -17,5 +17,7 @@ public class WebReader
 		Thread reader = new Thread(new NASDAQreader());
 		reader.start();
 		reader.join();
+
+
 	}
 }
