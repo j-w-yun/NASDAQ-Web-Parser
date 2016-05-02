@@ -254,7 +254,7 @@ public class JayList<T> implements MyDeque<T>
 	*/
 	public T add(T entry, int position)
 	{
-		return add(entry, NULL, position);
+		return add(entry, position, NULL);
 	}
 	/**
 	*	Bottleneck synchronized with this.
@@ -263,13 +263,13 @@ public class JayList<T> implements MyDeque<T>
 	*	@param keyword Used for development.
 	*	@param position The relative position (not the underlying index) at which the entry will be inserted into.
 	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
-	*	@throws IllegalArgumentException when entry is null or if the position is not valid.
+	*	@throws IllegalArgumentException when entry is null or if the position is invalid.
 	*	@since 1.1.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized T add(T entry, Keyword keyword, int position)
+	public synchronized T add(T entry, int position, Keyword keyword)
 	{
-		if(entry == null || position < 0 || position >= size)
+		if(entry == null || position < 0 || position > size)
 			throw new IllegalArgumentException();
 
 		// DEBUG
@@ -286,7 +286,6 @@ public class JayList<T> implements MyDeque<T>
 		// END DEBUG
 
 
-		T toReturn = null;
 		checkInitialization();
 		if(isFull())
 		{
@@ -302,7 +301,7 @@ public class JayList<T> implements MyDeque<T>
 				{
 					addLast(removeFirst());
 				}
-				toReturn = addFirst(entry);
+				addFirst(entry);
 				// TODO
 				for(int j = 0; j < position; j++)
 				{
@@ -315,18 +314,13 @@ public class JayList<T> implements MyDeque<T>
 				{
 					addFirst(removeLast());
 				}
-				toReturn = addLast(entry);
+				addLast(entry);
 				// TODO
 				for(int j = 0; j < position; j++)
 				{
 					addLast(removeFirst());
 				}
 			}
-		}
-		size++;
-		synchronized(this.getClass())
-		{
-			concurrentSize++;
 		}
 
 
@@ -339,12 +333,13 @@ public class JayList<T> implements MyDeque<T>
 		}
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "After ADD POSITION : SIZE : " + size + " ADDED " + entry + "(" + entry.getClass().toString() + ")");
+			print(1, "After ADD POSITION : SIZE : " + size + " ADDED " + get(position) + "(" + get(position).getClass().toString() + ")");
 		}
 		// END DEBUG
 
 		// TODO
-		return toReturn;
+		return null;
+		// return get(position);
 	}
 
 	/**
@@ -516,7 +511,7 @@ public class JayList<T> implements MyDeque<T>
 	/**
 	*	@param position The relative position (not the underlying index) at which the entry will be removed from.
 	*	@throws IllegalStateException when this has not been properly initialized.
-	*	@throws IllegalArgumentException if the position is not valid.
+	*	@throws IllegalArgumentException if the position is invalid.
 	*	@throws NoSuchElementException if data structure is empty.
 	*	@throws NullPointerException if popped value is null.
 	*	@since 1.1.0
@@ -524,7 +519,7 @@ public class JayList<T> implements MyDeque<T>
 	*/
 	public T remove(int position)
 	{
-		return remove(NULL, position);
+		return remove(position, NULL);
 	}
 	/**
 	*	Bottleneck synchronized with this.
@@ -532,13 +527,13 @@ public class JayList<T> implements MyDeque<T>
 	*	@param keyword Used for development.
 	*	@param position The relative position (not the underlying index) at which the entry will be removed from.
 	*	@throws IllegalStateException when this has not been properly initialized.
-	*	@throws IllegalArgumentException if the position is not valid.
+	*	@throws IllegalArgumentException if the position is invalid.
 	*	@throws NoSuchElementException if data structure is empty.
 	*	@throws NullPointerException if popped value is null.
 	*	@since 1.1.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized T remove(Keyword keyword, int position)
+	public synchronized T remove(int position, Keyword keyword)
 	{
 		if(position < 0 || position >= size)
 			throw new IllegalArgumentException();
@@ -557,7 +552,7 @@ public class JayList<T> implements MyDeque<T>
 		}
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "Prior to REMOVE POSITION: SIZE : " + size + " REMOVING " + jayList[position] + "(" + jayList[position].getClass().toString() + ")");
+			print(1, "Prior to REMOVE POSITION: SIZE : " + size + " REMOVING " + get(position) + "(" + get(position).getClass().toString() + ")");
 		}
 		// END DEBUG
 
@@ -591,11 +586,6 @@ public class JayList<T> implements MyDeque<T>
 				addLast(removeFirst());
 			}
 		}
-		size--;
-		synchronized(this.getClass())
-		{
-			concurrentSize--;
-		}
 
 
 		// DEBUG
@@ -626,7 +616,7 @@ public class JayList<T> implements MyDeque<T>
 	}
 
 	/**
-	*	@return the element that is next in queue.
+	*	@return the element that is last.
 	*	@throws NoSuchElementException if data structure is empty.
 	*	@throws NullPointerException if next value is null.
 	*	@since 1.0.0
@@ -640,7 +630,7 @@ public class JayList<T> implements MyDeque<T>
 	*	Bottleneck synchronized with this.
 	*
 	*	@param keyword Used for development.
-	*	@return the element that is next in queue.
+	*	@return the element that is last.
 	*	@throws NoSuchElementException if data structure is empty.
 	*	@throws NullPointerException if next value is null.
 	*	@since 1.0.0
@@ -656,13 +646,13 @@ public class JayList<T> implements MyDeque<T>
 		// DEBUG
 		if(keyword == IDDEBUG)
 		{
-			print(1, "Prior to ELEMENT : CAPACITY : " + capacity);
-			print(1, "Prior to ELEMENT : HEADCURSOR : " + headCursor);
-			print(1, "Prior to ELEMENT : TAILINDEX : " + tailIndex);
+			print(1, "Prior to GET LAST : CAPACITY : " + capacity);
+			print(1, "Prior to GET LAST : HEADCURSOR : " + headCursor);
+			print(1, "Prior to GET LAST : TAILINDEX : " + tailIndex);
 		}
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "Prior to ELEMENT : SIZE : " + size + " ELEMENTING " + jayList[tailIndex] + "(" + jayList[tailIndex].getClass().toString() + ")");
+			print(1, "Prior to GET LAST : SIZE : " + size + " GETTING " + jayList[tailIndex] + "(" + jayList[tailIndex].getClass().toString() + ")");
 		}
 		// END DEBUG
 
@@ -674,13 +664,13 @@ public class JayList<T> implements MyDeque<T>
 		// DEBUG
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "After ELEMENT : SIZE : " + size + " ELEMENTED " + toReturn + "(" + toReturn.getClass().toString() + ")");
+			print(1, "After GET LAST : SIZE : " + size + " GETTED " + toReturn + "(" + toReturn.getClass().toString() + ")");
 		}
 		if(keyword == IDDEBUG)
 		{
-			print(1, "After ELEMENT : CAPACITY : " + capacity);
-			print(1, "After ELEMENT : HEADCURSOR : " + headCursor);
-			print(1, "After ELEMENT : TAILINDEX : " + tailIndex);
+			print(1, "After GET LAST : CAPACITY : " + capacity);
+			print(1, "After GET LAST : HEADCURSOR : " + headCursor);
+			print(1, "After GET LAST : TAILINDEX : " + tailIndex);
 		}
 		// // END DEBUG
 
@@ -691,7 +681,7 @@ public class JayList<T> implements MyDeque<T>
 	}
 
 	/**
-	*	@return the element that is next in stack.
+	*	@return the element that is first.
 	*	@throws NoSuchElementException if data structure is empty.
 	*	@throws NullPointerException if next value is null.
 	*	@since 1.0.0
@@ -705,7 +695,7 @@ public class JayList<T> implements MyDeque<T>
 	*	Bottleneck synchronized with this.
 	*
 	*	@param keyword Used for development.
-	*	@return the element that is next in stack.
+	*	@return the element that is first.
 	*	@throws NoSuchElementException if data structure is empty.
 	*	@throws NullPointerException if next value is null.
 	*	@since 1.0.0
@@ -721,13 +711,13 @@ public class JayList<T> implements MyDeque<T>
 		// DEBUG
 		if(keyword == IDDEBUG)
 		{
-			print(1, "Prior to PEEK : CAPACITY : " + capacity);
-			print(1, "Prior to PEEK : HEADCURSOR : " + headCursor);
-			print(1, "Prior to PEEK : TAILINDEX : " + tailIndex);
+			print(1, "Prior to GET FIRST : CAPACITY : " + capacity);
+			print(1, "Prior to GET FIRST : HEADCURSOR : " + headCursor);
+			print(1, "Prior to GET FIRST : TAILINDEX : " + tailIndex);
 		}
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "Prior to PEEK : SIZE : " + size + " PEEKING " + jayList[tailIndex] + "(" + jayList[tailIndex].getClass().toString() + ")");
+			print(1, "Prior to GET FIRST : SIZE : " + size + " GETTING " + jayList[tailIndex] + "(" + jayList[tailIndex].getClass().toString() + ")");
 		}
 		// END DEBUG
 
@@ -739,13 +729,86 @@ public class JayList<T> implements MyDeque<T>
 		// DEBUG
 		if(keyword == DEBUG || keyword == IDDEBUG)
 		{
-			print(1, "After PEEK : SIZE : " + size + " PEEKED " + toReturn + "(" + toReturn.getClass().toString() + ")");
+			print(1, "After GET FIRST : SIZE : " + size + " GETTED " + toReturn + "(" + toReturn.getClass().toString() + ")");
 		}
 		if(keyword == IDDEBUG)
 		{
-			print(1, "After PEEK : CAPACITY : " + capacity);
-			print(1, "After PEEK : HEADCURSOR : " + headCursor);
-			print(1, "After PEEK : TAILINDEX : " + tailIndex);
+			print(1, "After GET FIRST : CAPACITY : " + capacity);
+			print(1, "After GET FIRST : HEADCURSOR : " + headCursor);
+			print(1, "After GET FIRST : TAILINDEX : " + tailIndex);
+		}
+		// // END DEBUG
+
+
+		if(toReturn == null)
+			throw new NullPointerException();
+		return toReturn;
+	}
+
+	/**
+	*	@param position The entry to return at this relative position.
+	*	@return the element at the relative position.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if the value is null.
+	*	@throws IllegalArgumentException if the position is invalid.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public T get(int position)
+	{
+		return get(NULL, position);
+	}
+	/**
+	*	Bottleneck synchronized with this.
+	*
+	*	@param keyword Used for development.
+	*	@param position The entry to return at this relative position.
+	*	@return the element at the relative position.
+	*	@throws NoSuchElementException if data structure is empty.
+	*	@throws NullPointerException if the value is null.
+	*	@throws IllegalArgumentException if the position is invalid.
+	*	@since 1.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public synchronized T get(Keyword keyword, int position)
+	{
+		if(position < 0 || position >= size)
+			throw new IllegalArgumentException();
+
+		// check that data structure is non-empty
+		if(isEmpty())
+			throw new NoSuchElementException();
+
+
+		// DEBUG
+		if(keyword == IDDEBUG)
+		{
+			print(1, "Prior to GET POSITION : CAPACITY : " + capacity);
+			print(1, "Prior to GET POSITION : HEADCURSOR : " + headCursor);
+			print(1, "Prior to GET POSITION : TAILINDEX : " + tailIndex);
+		}
+		if(keyword == DEBUG || keyword == IDDEBUG)
+		{
+			print(1, "Prior to GET POSITION : SIZE : " + size);
+		}
+		// END DEBUG
+
+
+		T toReturn = null;
+		int relativePosition = (tailIndex + size - position - 1) % capacity;
+		toReturn = jayList[relativePosition];
+
+
+		// DEBUG
+		if(keyword == DEBUG || keyword == IDDEBUG)
+		{
+			print(1, "After GET POSITION : SIZE : " + size + " GETTED " + toReturn + "(" + toReturn.getClass().toString() + ")");
+		}
+		if(keyword == IDDEBUG)
+		{
+			print(1, "After GET POSITION : CAPACITY : " + capacity);
+			print(1, "After GET POSITION : HEADCURSOR : " + headCursor);
+			print(1, "After GET POSITION : TAILINDEX : " + tailIndex);
 		}
 		// // END DEBUG
 
