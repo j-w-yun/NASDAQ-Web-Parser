@@ -212,7 +212,7 @@ public class Tester
 		System.out.println("\n\t****************************SHARED CLASS****************************\n");
 
 		@SuppressWarnings("unchecked")
-		JayList[] lists = new JayList[100];
+		JayList<Integer>[] lists = new JayList[100];
 		Task[] tasks = new Task[100];
 		Thread[] threads = new Thread[100];
 		for(int j = 0; j < 100; j++)
