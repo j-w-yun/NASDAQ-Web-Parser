@@ -158,7 +158,7 @@ public class NASDAQreader implements Callable
 
 					if(read == true && lineCounter < 8)
 					{
-						System.out.println(temp2);
+						// System.out.println(temp2);
 						unparsed.addFirst(temp2);
 					}
 					lineCounter++;
