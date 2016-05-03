@@ -1,9 +1,10 @@
 import org.apache.commons.io.IOUtils;
 import java.util.*;
+import java.util.concurrent.*;
 import java.io.*;
 import java.net.*;
 
-public class NASDAQreader implements Runnable
+public class NASDAQreader implements Callable
 {
 	private String address = "http://www.nasdaq.com/markets/indices/sector-indices.aspx";
 	private JayList<String> unparsed;
@@ -11,11 +12,16 @@ public class NASDAQreader implements Runnable
 
 	private class Parser
 	{
+		private JayList<String[]> parsed;
+
+		private Parser()
+		{
+			parsed = new JayList<String[]>();
+		}
+
 		private JayList<String[]> parse(JayList<String> unparsed)
 		{
-			JayList<String[]> parsed = new JayList<String[]>();
-
-			for(int j = 0, k = unparsed.size(); j < k; j++)
+			for(int j = 0, k = unparsed.length(); j < k; j++)
 			{
 				String read = unparsed.removeLast();
 				int l = j % 11;
@@ -40,12 +46,77 @@ public class NASDAQreader implements Runnable
 				}
 			}
 
-			for(int j = 0, k = unparsed.size(); j < k; j++)
+			String temp = null;
+			JayList<String> indexAttrib = new JayList<String>();
+
+			while(!unparsed.isEmpty())
 			{
-				System.out.println(unparsed.removeLast());
+
+				// read symbol.
+				temp = unparsed.removeLast();
+				indexAttrib.addLast(read(temp, "?symbol=", "&amp"));
+
+				// read index value.
+				temp = unparsed.removeLast();
+				indexAttrib.addLast(read(temp, "<td>", "</td>"));
+
+				// read change net.
+				temp = unparsed.removeLast();
+				indexAttrib.addLast(read(temp, "class=", ">"));	// up/down net
+				indexAttrib.addLast(read(temp, "\">", "&nbsp"));	// net value
+				indexAttrib.addLast(read(temp, ";&nbsp;", "%</td>"));	// percent
+
+				// read high.
+				temp = unparsed.removeLast();
+				indexAttrib.addLast(read(temp, "<td>", "</td>"));
+
+				// read low.
+				temp = unparsed.removeLast();
+				indexAttrib.addLast(read(temp, "<td>", "</td>"));
+
+				int index = 0;
+				String[] toStore = new String[7];
+				while(!indexAttrib.isEmpty())
+				{
+					for(int j = 0; j < 7; j++)
+					{
+						// System.out.println("HERE");
+						toStore[j] = indexAttrib.removeFirst();
+					}
+					parsed.addLast(toStore);
+				}
 			}
 
 			return parsed;
+		}
+
+		private String read(String toRead, String readAfter, String readUntil)
+		{
+			if(!toRead.contains(readAfter) && !toRead.contains(readUntil))
+			{
+				throw new IllegalArgumentException();
+			}
+
+			StringBuilder sb = new StringBuilder();
+			int charCounter = toRead.indexOf(readAfter);
+			charCounter += readAfter.length() - 1;
+
+			if(readUntil.length() == 1)
+			{
+				while(toRead.charAt(++charCounter) != readUntil.charAt(0))
+				{
+					sb.append(toRead.charAt(charCounter));
+				}
+			}
+			else
+			{
+				while(toRead.charAt(++charCounter) != readUntil.charAt(0) && toRead.charAt(charCounter + 1) != readUntil.charAt(1))
+				{
+					sb.append(toRead.charAt(charCounter));
+				}
+			}
+
+			return sb.toString();
 		}
 	}
 
@@ -55,12 +126,12 @@ public class NASDAQreader implements Runnable
 		parser = new Parser();
 	}
 
-	public void run()
+	public JayList<String[]> call()
 	{
-		read();
+		return read();
 	}
 
-	private void read()
+	private JayList<String[]> read()
 	{
 		try
 		{
@@ -87,16 +158,15 @@ public class NASDAQreader implements Runnable
 
 					if(read == true && lineCounter < 8)
 					{
+						System.out.println(temp2);
 						unparsed.addFirst(temp2);
 					}
 					lineCounter++;
 				}
 			}
-			// System.out.println(body);
 		}
 		catch(Exception e) {e.printStackTrace();}
 
-
-		parser.parse(unparsed);
+		return parser.parse(unparsed);
 	}
 }
