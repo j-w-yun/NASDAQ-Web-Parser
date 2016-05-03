@@ -249,7 +249,7 @@ public class JayList<T> implements MyDeque<T>
 	*	@param position The relative position (not the underlying index) at which the entry will be inserted into.
 	*	@throws IllegalStateException when this has not been properly initialized or when entry cannot be added due to a predetermined maximum capacity.
 	*	@throws IllegalArgumentException when entry is null.
-	*	@since 1..0
+	*	@since 1.1.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public T add(T entry, int position)
@@ -767,7 +767,7 @@ public class JayList<T> implements MyDeque<T>
 	*	@throws NoSuchElementException if data structure is empty.
 	*	@throws NullPointerException if the value is null.
 	*	@throws IllegalArgumentException if the position is invalid.
-	*	@since 1.0.0
+	*	@since 1.1.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public T get(int position)
@@ -1025,11 +1025,18 @@ public class JayList<T> implements MyDeque<T>
 	}
 
 	/**
+	*	@return true if values were cleared; false if no valued exists.
+	*	@throws IllegalStateException when this has not been properly initialized.
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized void clear()
+	public synchronized boolean clear()
 	{
+		checkInitialization();
+
+		if(isEmpty())
+			return false;
+
 		jayList = null;
 		jayList = constructArray(DEFAULT_CAPACITY);
 		synchronized(this.getClass())
@@ -1045,6 +1052,8 @@ public class JayList<T> implements MyDeque<T>
 		}
 		headCursor = 0;
 		tailIndex = 0;
+
+		return true;
 	}
 
 	public synchronized boolean setArray(T[] input)
@@ -1073,12 +1082,16 @@ public class JayList<T> implements MyDeque<T>
 		if(length + 1 > MAX_CAPACITY)
 			throw new IllegalArgumentException();
 
-
-		jayList = constructArray(length + 1);
-		capacity = length + 1;
 		synchronized(this.getClass())
 		{
 			concurrentCapacity -= jayList.length;
+		}
+
+		jayList = constructArray(length + 1);
+		capacity = length + 1;
+
+		synchronized(this.getClass())
+		{
 			concurrentCapacity += length + 1;
 		}
 
@@ -1092,7 +1105,7 @@ public class JayList<T> implements MyDeque<T>
 		{
 			if(input[j] != null)
 			{
-				jayList[j] = input[j];
+				jayList[(length - 1) - j] = input[j];
 				size++;
 			}
 		}
@@ -1117,7 +1130,7 @@ public class JayList<T> implements MyDeque<T>
 		checkInitialization();
 		int newTailIndex = tailIndex;
 		T[] toReturn = (T[]) new Object[size];
-		for(int j = 0; j < size; j++)
+		for(int j = size - 1; j >= 0; j--)
 		{
 			toReturn[j] = jayList[newTailIndex++ % capacity];
 		}
@@ -1184,17 +1197,22 @@ public class JayList<T> implements MyDeque<T>
 	/**
 	*	Client ensures object types are comparable.
 	*
+	*	@return true if sort was successful; false if no values exists.
 	*	@throws UnsupportedOperationException if object types are not comparable.
-	*	@since 1.0.0
+	*	@since 1.1.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized void sort()
+	public synchronized boolean sort()
 	{
+		if(isEmpty())
+			return false;
+
 		try
 		{
 			T[] a = toArray();
 			Arrays.sort(a);
 			setArray(a);
+			return true;
 		}
 		catch(Exception e)
 		{
@@ -1207,7 +1225,7 @@ public class JayList<T> implements MyDeque<T>
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public synchronized int size()
+	public synchronized int length()
 	{
 		return size;
 	}
@@ -1234,7 +1252,7 @@ public class JayList<T> implements MyDeque<T>
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public boolean isEmpty()
+	private boolean isEmpty()
 	{
 		if(headCursor == tailIndex)
 			return true;
@@ -1278,12 +1296,12 @@ public class JayList<T> implements MyDeque<T>
 	*/
 	public synchronized String toString()
 	{
-		return jayList.toString();
+		return Arrays.toString(jayList);
 	}
 
 	/**
 	*	@param keyword Keyword that the method body portion execution is dependent on
-	*	@since 1.0.0
+	*	@since 1.1.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	public synchronized void showState(Keyword keyword)
@@ -1296,10 +1314,11 @@ public class JayList<T> implements MyDeque<T>
 			print(1, "EXPANSION_FACTOR :\t" + EXPANSION_FACTOR);
 			print(1, "REDUCTION_FACTOR :\t" + REDUCTION_FACTOR);
 			print(1, "concurrentObjects :\t" + concurrentObjects);
-			print(1, "concurrentCapacity :\t" + concurrentCapacity);
-			print(1, "concurrentSize : \t" + concurrentSize);
-			print(1, "size :\t\t\t" + size + " <---");
-			print(1, "capacity :\t\t" + capacity + " <---");
+			print(1, "concurrentSize :\t" + concurrentSize + "\t<---A");
+			print(1, "length between indices :" + (((capacity - tailIndex) + headCursor) % capacity) + "\t<---A");
+			print(1, "size :\t\t\t" + size + "\t<---A");
+			print(1, "concurrentCapacity :\t" + concurrentCapacity + "\t<---B");
+			print(1, "capacity :\t\t" + capacity + "\t<---B");
 			print(1, "initialized :\t\t" + initialized);
 			print(1, "headCursor :\t\t" + headCursor);
 			print(1, "tailIndex :\t\t" + tailIndex);

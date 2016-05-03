@@ -7,57 +7,138 @@ public class Tester
 	public static void main(String[] args)
 	{
 		JayList<Object> list = new JayList<Object>();
-		final int size = 1000;//1031;
 
-		Object[] a1 = new Integer[size];
-		Object[] a2 = new Double[size];
-		Object[] a3 = new Float[size];
-		Object[] alist = new Object[size];
-
-		int counter = 0;
-
+		final int size = 300;
+		Integer[] alist = new Integer[size];
 		for(int j = 0; j < size; j++)
 		{
-			a1[j] = new Integer(j);
-			a2[j] = new Double(j);
-			a3[j] = new Float(j);
-
-			// if(counter == 2)
-			// {
-			// 	alist[j] = a3[j];
-			// 	counter++;
-			// }
-			// else if(counter == 1)
-			// {
-			// 	alist[j] = a2[j];
-			// 	counter++;
-			// }
-			// else
-			// {
-				alist[j] = a1[j];
-			// }
-			// counter = ++counter % 3;
+			alist[j] = new Integer(j);
 		}
 
-		System.out.println("\n\n\t\t\tADD LAST");
+		System.out.println("\n\t**************************T addFirst(T)**************************\n");
 		for(int j = 0; j < 10; j++)
 		{
-			System.out.print(list.addLast(alist[j]));//, DEBUG);
-			list.showState(IDDEBUG);
+			list.addFirst(alist[j]);//, DEBUG);
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
 		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
 
-		System.out.println("\n\n\t\t\tADD POSITION");
+		System.out.println("\n\t**************************T addLast(T)**************************\n");
 		for(int j = 0; j < 10; j++)
 		{
-			System.out.println(list.add(alist[100 + j], 10, IDDEBUG));
-			list.showState(IDDEBUG);
+			list.addLast(alist[100 + j]);
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
 		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
 
-		System.out.println("\n\n\t\t\tREMOVE POSITION");
+		System.out.println("\n\t**************************T add(T, 10)**************************\n");
 		for(int j = 0; j < 10; j++)
 		{
-			System.out.println(list.remove(5, IDDEBUG));
-			list.showState(IDDEBUG);
+			list.add(alist[200 + j], 10);
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
 		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
+
+		System.out.println("\n\t**************************T removeFirst()**************************\n");
+		for(int j = 0; j < 10; j++)
+		{
+			list.removeFirst();
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
+		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
+
+		System.out.println("\n\t**************************T removeLast()**************************\n");
+		for(int j = 0; j < 10; j++)
+		{
+			list.removeLast();
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
+		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
+
+		System.out.println("\n\t**************************T remove(5)**************************\n");
+		for(int j = 0; j < 5; j++)
+		{
+			list.remove(5);
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
+		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
+
+		System.out.println("\n\t**************************T getFirst()**************************\n");
+		for(int j = 0; j < 1; j++)
+		{
+			System.out.println("\tGOT: " + list.getFirst() + "\n");
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
+		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
+
+		System.out.println("\n\t**************************T getLast()**************************\n");
+		for(int j = 0; j < 1; j++)
+		{
+			System.out.println("\tGOT: " + list.getLast() + "\n");
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
+		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
+
+		System.out.println("\n\t**************************T get(3)**************************\n");
+		for(int j = 0; j < 1; j++)
+		{
+			System.out.println("\tGOT: " + list.get(3) + "\n");
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
+		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
+
+		System.out.println("\n\t**************************boolean clear()**************************\n");
+		for(int j = 0; j < 1; j++)
+		{
+			System.out.println("RETURN : " + list.clear() + "\n");
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
+		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
+
+		System.out.println("\n\t**************************boolean setArray(T[])**************************\n");
+		for(int j = 0; j < 1; j++)
+		{
+			System.out.println("RETURN : " + list.setArray(alist) + "\n");
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
+		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
+
+		System.out.println("\n\t**************************boolean sort()**************************\n");
+		for(int j = 0; j < 1; j++)
+		{
+			System.out.println("RETURN : " + list.sort() + "\n");
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
+		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
+
+		System.out.println("\n\t**************************boolean clear()**************************\n");
+		for(int j = 0; j < 1; j++)
+		{
+			System.out.println("RETURN : " + list.clear() + "\n");
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
+		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
+
+		System.out.println("\n\t**************************boolean sort()**************************\n");
+		for(int j = 0; j < 1; j++)
+		{
+			System.out.println("RETURN : " + list.sort() + "\n");
+			System.out.println(Arrays.toString(list.toArray()) + "\n");
+		}
+		System.out.println("\tLENGTH : " + list.length());
+		list.showState(DEBUG);
 	}
 }
