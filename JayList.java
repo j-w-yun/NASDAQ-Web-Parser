@@ -1119,7 +1119,7 @@ public class JayList<T> implements MyDeque<T>
 	}
 
 	/**
-	*	@return A copy of this array.
+	*	@return a copy of this array.
 	*	@throws IllegalStateException when this has not been properly initialized.
 	*	@throws NullPointerException when jayList is null.
 	*	@since 1.0.0
@@ -1139,7 +1139,7 @@ public class JayList<T> implements MyDeque<T>
 
 	/**
 	*	@param toCopy An array used as a template.
-	*	@return A copy of the accepted array.
+	*	@return a copy of the accepted array.
 	*	@throws NullPointerException when the accepted array is null.
 	*	@throws IllegalArgumentException when the size of the accepted array exceeds a predetermined maximum capacity.
 	*	@since 1.0.0
@@ -1173,7 +1173,7 @@ public class JayList<T> implements MyDeque<T>
 	*	Client method needs to ensure synchronization with this.
 	*
 	*	@param capacity The capacity of the array to be constructed.
-	*	@return Initialized array of T types with the accepted value as its capacity.
+	*	@return initialized array of T types with the accepted value as its capacity.
 	*	@throws IllegalArgumentException when the size of the accepted value exceeds a predetermined maximum capacity.
 	*	@throws IllegalArgumentException when the size of the accepted value is less than one.
 	*	@since 1.0.0
@@ -1221,7 +1221,7 @@ public class JayList<T> implements MyDeque<T>
 	}
 
 	/**
-	*	@return size The number of elements contained within this data structure.
+	*	@return number of elements contained within this data structure.
 	*	@since 1.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/

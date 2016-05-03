@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.*;
 import constant.*;
 import static constant.Keyword.*;
 
@@ -6,7 +7,7 @@ public class Tester
 {
 	public static void main(String[] args)
 	{
-		JayList<Object> list = new JayList<Object>();
+		JayList<Integer> list = new JayList<Integer>();
 
 		final int size = 300;
 		Integer[] alist = new Integer[size];
@@ -140,5 +141,106 @@ public class Tester
 		}
 		System.out.println("\tLENGTH : " + list.length());
 		list.showState(DEBUG);
+
+		list = null;
+		System.gc();
+
+
+
+		System.out.println("\n\t####################################################################\n");
+		System.out.println("\n\t##########################CONCURRENCY TEST##########################\n");
+		System.out.println("\n\t####################################################################\n\n");
+
+		System.out.println("\n\t****************************SHARED  LIST****************************\n");
+
+		class Task implements Runnable
+		{
+			JayList<Integer> list2;
+
+			public Task(JayList<Integer> list2)
+			{
+				this.list2 = list2;
+			}
+
+			public void run()
+			{
+				for(int j = 0; j < alist.length; j++)
+				{
+					list2.addFirst(alist[j]);
+				}
+
+				for(int j = 0; j < alist.length; j++)
+				{
+					list2.removeFirst();
+				}
+
+				for(int j = 0; j < alist.length; j++)
+				{
+					list2.addLast(alist[j]);
+				}
+
+				for(int j = 0; j < alist.length; j++)
+				{
+					list2.removeLast();
+				}
+
+				for(int j = 0; j < alist.length; j++)
+				{
+					list2.add(alist[j], 0);
+				}
+
+				for(int j = 0; j < alist.length; j++)
+				{
+					list2.remove(0);
+				}
+			}
+		}
+
+		JayList<Integer> list2 = new JayList<Integer>();
+
+		// should show 1 existing instance of JayList.
+		list2.showState(DEBUG);
+
+		ExecutorService executor = Executors.newFixedThreadPool(100);
+		executor.execute(new Task(list2));
+		executor.shutdown();
+		while(!executor.isTerminated()) {}
+
+		// should show a different and only 1 reference to JayList.
+		list2.showState(DEBUG);
+
+		System.out.println("\n\t****************************SHARED CLASS****************************\n");
+
+		@SuppressWarnings("unchecked")
+		JayList[] lists = new JayList[100];
+		Task[] tasks = new Task[100];
+		Thread[] threads = new Thread[100];
+		for(int j = 0; j < 100; j++)
+		{
+			lists[j] = new JayList<Integer>();
+			tasks[j] = new Task(lists[j]);
+		}
+
+		for(int j = 0; j < 100; j++)
+		{
+			threads[j] = new Thread(tasks[j]);
+			threads[j].start();
+			try
+			{
+				threads[j].join();
+			}
+			catch(Exception e) {}
+		}
+
+		// should show 201 unique references.
+		list2.showState(DEBUG);
+
+		lists = null;
+		tasks = null;
+		threads = null;
+		System.gc();
+
+		// should show 1 reference to JayList the same as the previous reference to JayList.
+		list2.showState(DEBUG);
 	}
 }
